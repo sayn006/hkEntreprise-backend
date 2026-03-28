@@ -15,6 +15,12 @@ if [ -n "$JWT_PRIVATE_KEY_B64" ]; then
     echo "✅ Clés JWT configurées"
 fi
 
+# Créer .env minimal si absent (Symfony le requiert même en prod)
+if [ ! -f .env ]; then
+    echo "APP_ENV=prod" > .env
+    echo "APP_SECRET=${APP_SECRET:-$(cat /dev/urandom | tr -dc 'a-f0-9' | head -c 32)}" >> .env
+fi
+
 mkdir -p var/cache var/log public/uploads /var/log/php /var/log/supervisor /var/log/nginx
 chmod -R 777 var 2>/dev/null || true
 

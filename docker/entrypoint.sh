@@ -1,26 +1,40 @@
 #!/bin/sh
 set -e
 
+echo "=========================================="
+echo "HK Entreprise Backend - Démarrage"
+echo "=========================================="
+
 # JWT keys depuis env vars base64
+echo "[0/6] Configuration JWT..."
 if [ -n "$JWT_PRIVATE_KEY_B64" ]; then
     mkdir -p /var/www/html/config/jwt
     echo "$JWT_PRIVATE_KEY_B64" | base64 -d > /var/www/html/config/jwt/private.pem
     echo "$JWT_PUBLIC_KEY_B64" | base64 -d > /var/www/html/config/jwt/public.pem
     chmod 600 /var/www/html/config/jwt/private.pem
+    echo "✅ Clés JWT configurées"
 fi
 
-# Dossiers uploads
-mkdir -p /var/www/html/public/uploads/logos
-mkdir -p /var/www/html/public/uploads/products
-mkdir -p /var/www/html/public/uploads/categories
-chmod -R 777 /var/www/html/public/uploads
-chmod -R 777 /var/www/html/var
+mkdir -p var/cache var/log public/uploads /var/log/php /var/log/supervisor /var/log/nginx
+chmod -R 777 var
 
-# Cache Symfony
-php bin/console cache:warmup --env=prod 2>/dev/null || true
+echo "[3/6] Réchauffement du cache Symfony..."
+php bin/console cache:clear --env=prod --no-debug 2>/dev/null || true
+php bin/console cache:warmup --env=prod --no-debug 2>/dev/null || true
 
-# Migrations
-php bin/console doctrine:migrations:migrate --no-interaction --env=prod 2>/dev/null || true
+echo "[4/6] Exécution des migrations..."
+php bin/console doctrine:migrations:migrate --no-interaction --allow-no-migration 2>&1 || echo "⚠️ Migrations ignorées"
 
-# Lancer supervisord
-exec /usr/bin/supervisord -c /etc/supervisord.conf
+echo "[5/6] Installation des assets..."
+php bin/console assets:install public 2>/dev/null || true
+
+echo "[6/6] Permissions finales..."
+chown -R www-data:www-data var public/uploads /var/log/php
+chmod -R 777 var
+chmod -R 755 public/uploads
+
+echo "=========================================="
+echo "✅ HK Entreprise prêt - Démarrage"
+echo "=========================================="
+
+exec "$@"

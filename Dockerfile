@@ -11,7 +11,7 @@
 ARG BUILD_ENV=prod
 
 # Stage 1: Composer dependencies (PHP 8.2 pour compatibilité)
-FROM php:8.2-cli-alpine AS composer_stage
+FROM php:8.4-cli-alpine AS composer_stage
 
 ARG BUILD_ENV
 ENV BUILD_ENV=${BUILD_ENV}
@@ -35,7 +35,7 @@ RUN if [ "$BUILD_ENV" = "dev" ]; then \
     fi
 
 # Stage 2: Production image
-FROM php:8.2-fpm-alpine
+FROM php:8.4-fpm-alpine
 
 # Récupérer l'argument de build
 ARG BUILD_ENV=prod

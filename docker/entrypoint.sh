@@ -16,7 +16,7 @@ if [ -n "$JWT_PRIVATE_KEY_B64" ]; then
 fi
 
 mkdir -p var/cache var/log public/uploads /var/log/php /var/log/supervisor /var/log/nginx
-chmod -R 777 var
+chmod -R 777 var 2>/dev/null || true
 
 echo "[3/6] Réchauffement du cache Symfony..."
 php bin/console cache:clear --env=prod --no-debug 2>/dev/null || true
@@ -29,9 +29,9 @@ echo "[5/6] Installation des assets..."
 php bin/console assets:install public 2>/dev/null || true
 
 echo "[6/6] Permissions finales..."
-chown -R www-data:www-data var public/uploads /var/log/php
-chmod -R 777 var
-chmod -R 755 public/uploads
+chown -R www-data:www-data var public/uploads /var/log/php 2>/dev/null || true
+chmod -R 777 var 2>/dev/null || true
+chmod -R 755 public/uploads 2>/dev/null || true
 
 echo "=========================================="
 echo "✅ HK Entreprise prêt - Démarrage"

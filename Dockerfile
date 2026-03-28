@@ -92,7 +92,7 @@ COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
 ARG BUILD_ENV=prod
 RUN echo "🔧 Configuration pour l'environnement: ${BUILD_ENV}" \
     && composer dump-autoload --optimize --classmap-authoritative \
-    && mkdir -p var/cache var/log public/uploads public/bundles \
+    && mkdir -p var/cache var/log public/uploads public/bundles var \
     && php bin/console assets:install public --env=${BUILD_ENV} --no-debug || echo "⚠️ Assets ignorés" \
     && php bin/console cache:warmup --env=${BUILD_ENV} --no-debug || echo "⚠️ Cache warmup ignoré" \
     && chown -R www-data:www-data var public/uploads public/bundles \

@@ -1,0 +1,251 @@
+<?php
+
+declare(strict_types=1);
+
+namespace DoctrineMigrations;
+
+use Doctrine\DBAL\Schema\Schema;
+use Doctrine\Migrations\AbstractMigration;
+
+/**
+ * Auto-generated Migration: Please modify to your needs!
+ */
+final class Version20260316142939 extends AbstractMigration
+{
+    public function getDescription(): string
+    {
+        return '';
+    }
+
+    public function up(Schema $schema): void
+    {
+        // this up() migration is auto-generated, please modify it to your needs
+        $this->addSql('CREATE TABLE avancement (id INT AUTO_INCREMENT NOT NULL, designation VARCHAR(255) NOT NULL, unite VARCHAR(50) DEFAULT NULL, qte VARCHAR(10) DEFAULT NULL, p_unitaire DOUBLE PRECISION DEFAULT NULL, p_total DOUBLE PRECISION DEFAULT NULL, m1 VARCHAR(10) DEFAULT NULL, p VARCHAR(10) DEFAULT NULL, total_ht DOUBLE PRECISION DEFAULT NULL, chantier_id INT NOT NULL, INDEX IDX_6D2A7A2AD0C0049D (chantier_id), PRIMARY KEY (id)) DEFAULT CHARACTER SET utf8mb4 COLLATE `utf8mb4_unicode_ci`');
+        $this->addSql('CREATE TABLE bon_commande (id INT AUTO_INCREMENT NOT NULL, created_at DATETIME NOT NULL, validate_at DATETIME DEFAULT NULL, num_commande VARCHAR(100) NOT NULL, is_finished INT DEFAULT NULL, is_validated INT DEFAULT NULL, fichier VARCHAR(255) DEFAULT NULL, montant_total DOUBLE PRECISION DEFAULT NULL, date_livraison DATE DEFAULT NULL, is_sent INT DEFAULT NULL, is_delivered INT DEFAULT NULL, delivered_at DATE DEFAULT NULL, commentaire LONGTEXT DEFAULT NULL, historique LONGTEXT DEFAULT NULL, date_livraison_fournisseur DATE DEFAULT NULL, chantier_id INT NOT NULL, create_user_id INT NOT NULL, validate_user_id INT DEFAULT NULL, fournisseur_id INT NOT NULL, fournisseur_contact_id INT DEFAULT NULL, sent_founisseur_contact_id INT DEFAULT NULL, INDEX IDX_159D9576D0C0049D (chantier_id), INDEX IDX_159D957685564492 (create_user_id), INDEX IDX_159D9576519BD316 (validate_user_id), INDEX IDX_159D9576670C757F (fournisseur_id), INDEX IDX_159D9576DA847AD1 (fournisseur_contact_id), INDEX IDX_159D9576EF83D36D (sent_founisseur_contact_id), PRIMARY KEY (id)) DEFAULT CHARACTER SET utf8mb4 COLLATE `utf8mb4_unicode_ci`');
+        $this->addSql('CREATE TABLE bon_commande_article (id INT AUTO_INCREMENT NOT NULL, reference VARCHAR(150) NOT NULL, designation LONGTEXT NOT NULL, qte INT NOT NULL, prix_unitaire_ht DOUBLE PRECISION DEFAULT NULL, bon_commande_id INT NOT NULL, INDEX IDX_A84533F8B4B54061 (bon_commande_id), PRIMARY KEY (id)) DEFAULT CHARACTER SET utf8mb4 COLLATE `utf8mb4_unicode_ci`');
+        $this->addSql('CREATE TABLE chantier (id INT AUTO_INCREMENT NOT NULL, soft_delete TINYINT DEFAULT 0 NOT NULL, code VARCHAR(25) NOT NULL, nom VARCHAR(255) NOT NULL, slug VARCHAR(255) NOT NULL, type VARCHAR(255) DEFAULT NULL, moe_nom_prenom VARCHAR(255) DEFAULT NULL, moe_email VARCHAR(255) DEFAULT NULL, adresse_chantier VARCHAR(255) DEFAULT NULL, montant_contrat_ht VARCHAR(255) DEFAULT NULL, duree_chantier VARCHAR(255) DEFAULT NULL, nature_prestation VARCHAR(255) DEFAULT NULL, nature_operation VARCHAR(255) DEFAULT NULL, cp_chantier VARCHAR(20) DEFAULT NULL, ville_chantier VARCHAR(255) DEFAULT NULL, date_signature_contrat DATE DEFAULT NULL, ville_signature_contrat VARCHAR(255) DEFAULT NULL, objet_marcher LONGTEXT DEFAULT NULL, adresse_chantier2 VARCHAR(100) DEFAULT NULL, contact_chantier VARCHAR(255) DEFAULT NULL, prorata_percent DOUBLE PRECISION DEFAULT NULL, rg_ht DOUBLE PRECISION DEFAULT NULL, tva DOUBLE PRECISION DEFAULT NULL, moe_tel VARCHAR(100) DEFAULT NULL, revision_prix DOUBLE PRECISION DEFAULT NULL, pourcentage_retenue NUMERIC(5, 2) DEFAULT NULL, latitude NUMERIC(10, 7) DEFAULT NULL, longitude NUMERIC(10, 7) DEFAULT NULL, geofence_radius INT DEFAULT 100, region_id INT DEFAULT NULL, type_calcul_id INT DEFAULT NULL, client_id INT DEFAULT NULL, INDEX IDX_636F27F698260155 (region_id), INDEX IDX_636F27F630D428B9 (type_calcul_id), INDEX IDX_636F27F619EB6921 (client_id), PRIMARY KEY (id)) DEFAULT CHARACTER SET utf8mb4 COLLATE `utf8mb4_unicode_ci`');
+        $this->addSql('CREATE TABLE chantier_responsable (id INT AUTO_INCREMENT NOT NULL, notification INT DEFAULT NULL, responsable_id INT DEFAULT NULL, chantier_id INT DEFAULT NULL, INDEX IDX_4DFA8CC553C59D72 (responsable_id), INDEX IDX_4DFA8CC5D0C0049D (chantier_id), PRIMARY KEY (id)) DEFAULT CHARACTER SET utf8mb4 COLLATE `utf8mb4_unicode_ci`');
+        $this->addSql('CREATE TABLE chantier_sous_traitent (montant_ht VARCHAR(255) DEFAULT NULL, tva VARCHAR(255) DEFAULT NULL, reference VARCHAR(255) DEFAULT NULL, date_contrat DATE DEFAULT NULL, description LONGTEXT DEFAULT NULL, created_at DATETIME DEFAULT NULL, updated_at DATETIME DEFAULT NULL, chantier_id INT NOT NULL, sous_traitent_id INT NOT NULL, INDEX IDX_C2FA849D0C0049D (chantier_id), INDEX IDX_C2FA8498041068 (sous_traitent_id), PRIMARY KEY (chantier_id, sous_traitent_id)) DEFAULT CHARACTER SET utf8mb4 COLLATE `utf8mb4_unicode_ci`');
+        $this->addSql('CREATE TABLE client (id INT AUTO_INCREMENT NOT NULL, raison_social VARCHAR(255) NOT NULL, siren_siret VARCHAR(150) DEFAULT NULL, telephone VARCHAR(25) DEFAULT NULL, email VARCHAR(200) DEFAULT NULL, adresse VARCHAR(255) DEFAULT NULL, code_postal VARCHAR(20) DEFAULT NULL, ville VARCHAR(255) DEFAULT NULL, email_compta VARCHAR(255) DEFAULT NULL, tel_compta VARCHAR(255) DEFAULT NULL, is_active TINYINT DEFAULT 1 NOT NULL, forme_juridique_id INT NOT NULL, affiliation_id INT DEFAULT NULL, INDEX IDX_C74404559AEE68EB (forme_juridique_id), INDEX IDX_C7440455CB94D64E (affiliation_id), PRIMARY KEY (id)) DEFAULT CHARACTER SET utf8mb4 COLLATE `utf8mb4_unicode_ci`');
+        $this->addSql('CREATE TABLE contacts (id INT AUTO_INCREMENT NOT NULL, nom VARCHAR(150) NOT NULL, prenom VARCHAR(255) DEFAULT NULL, email VARCHAR(255) DEFAULT NULL, telephone VARCHAR(25) DEFAULT NULL, entity VARCHAR(100) DEFAULT NULL, entity_id INT DEFAULT NULL, service VARCHAR(255) DEFAULT NULL, is_active TINYINT DEFAULT 1 NOT NULL, PRIMARY KEY (id)) DEFAULT CHARACTER SET utf8mb4 COLLATE `utf8mb4_unicode_ci`');
+        $this->addSql('CREATE TABLE devis (id INT AUTO_INCREMENT NOT NULL, titre VARCHAR(255) NOT NULL, numero VARCHAR(50) NOT NULL, nom_interlocuteur VARCHAR(255) DEFAULT NULL, prenom_interlocuteur VARCHAR(255) DEFAULT NULL, date_creation DATETIME NOT NULL, tva1 NUMERIC(10, 2) DEFAULT NULL, tva2 NUMERIC(10, 2) DEFAULT NULL, tva3 NUMERIC(10, 2) DEFAULT NULL, tva4 NUMERIC(10, 2) DEFAULT NULL, commentaire LONGTEXT DEFAULT NULL, repartition1 VARCHAR(255) DEFAULT NULL, repartition2 VARCHAR(255) DEFAULT NULL, repartition3 VARCHAR(255) DEFAULT NULL, tri1 VARCHAR(255) DEFAULT NULL, tri2 VARCHAR(255) DEFAULT NULL, tri3 VARCHAR(255) DEFAULT NULL, ventilation1 VARCHAR(255) DEFAULT NULL, ventilation2 VARCHAR(255) DEFAULT NULL, reference VARCHAR(255) DEFAULT NULL, date_remise DATETIME DEFAULT NULL, type VARCHAR(50) DEFAULT NULL, subvention NUMERIC(10, 2) DEFAULT NULL, adresse_chantier_titre VARCHAR(255) DEFAULT NULL, adresse_chantier_adresse1 VARCHAR(255) DEFAULT NULL, adresse_chantier_adresse2 VARCHAR(255) DEFAULT NULL, adresse_chantier_adresse3 VARCHAR(255) DEFAULT NULL, adresse_chantier_code_postal VARCHAR(10) DEFAULT NULL, adresse_chantier_ville VARCHAR(255) DEFAULT NULL, adresse_chantier_pays VARCHAR(255) DEFAULT NULL, coefficient_materiel NUMERIC(10, 2) NOT NULL, coefficient_main_oeuvre NUMERIC(10, 2) NOT NULL, taux_main_oeuvre NUMERIC(10, 2) NOT NULL, mode_pose VARCHAR(255) DEFAULT NULL, prix_conseilles TINYINT DEFAULT NULL, adresse_expedition_titre VARCHAR(255) DEFAULT NULL, adresse_expedition_adresse1 VARCHAR(255) DEFAULT NULL, adresse_expedition_adresse2 VARCHAR(255) DEFAULT NULL, adresse_expedition_adresse3 VARCHAR(255) DEFAULT NULL, adresse_expedition_code_postal VARCHAR(10) DEFAULT NULL, adresse_expedition_ville VARCHAR(255) DEFAULT NULL, adresse_expedition_pays VARCHAR(255) DEFAULT NULL, etat VARCHAR(50) NOT NULL, code_client VARCHAR(50) DEFAULT NULL, is_deleted TINYINT DEFAULT 0 NOT NULL, deleted_at DATETIME DEFAULT NULL, envoye_at DATETIME DEFAULT NULL, chantier_id INT DEFAULT NULL, created_by_id INT DEFAULT NULL, UNIQUE INDEX UNIQ_8B27C52BF55AE19E (numero), INDEX IDX_8B27C52BD0C0049D (chantier_id), INDEX IDX_8B27C52BB03A8386 (created_by_id), PRIMARY KEY (id)) DEFAULT CHARACTER SET utf8mb4 COLLATE `utf8mb4_unicode_ci`');
+        $this->addSql('CREATE TABLE devis_avancement (id INT AUTO_INCREMENT NOT NULL, numero VARCHAR(50) NOT NULL, numero_ordre INT NOT NULL, mois_reference DATETIME NOT NULL, date_creation DATETIME NOT NULL, etat VARCHAR(50) NOT NULL, total_ht NUMERIC(12, 2) DEFAULT 0 NOT NULL, total_cumule NUMERIC(12, 2) DEFAULT 0 NOT NULL, pourcentage_global NUMERIC(5, 2) DEFAULT 0 NOT NULL, is_deleted TINYINT DEFAULT 0 NOT NULL, deleted_at DATETIME DEFAULT NULL, devis_id INT NOT NULL, created_by_id INT DEFAULT NULL, facture_situation_id INT DEFAULT NULL, UNIQUE INDEX UNIQ_DD8B31C2F55AE19E (numero), INDEX IDX_DD8B31C241DEFADA (devis_id), INDEX IDX_DD8B31C2B03A8386 (created_by_id), UNIQUE INDEX UNIQ_DD8B31C260D1385D (facture_situation_id), PRIMARY KEY (id)) DEFAULT CHARACTER SET utf8mb4 COLLATE `utf8mb4_unicode_ci`');
+        $this->addSql('CREATE TABLE devis_avancement_detail (id INT AUTO_INCREMENT NOT NULL, reference VARCHAR(255) DEFAULT NULL, designation LONGTEXT DEFAULT NULL, quantite INT DEFAULT NULL, unite VARCHAR(50) DEFAULT NULL, prix_unitaire NUMERIC(10, 2) DEFAULT NULL, total_devis NUMERIC(12, 2) DEFAULT NULL, pourcentage_moins1 NUMERIC(5, 2) DEFAULT 0 NOT NULL, total_htmoins1 NUMERIC(12, 2) DEFAULT 0 NOT NULL, pourcentage NUMERIC(5, 2) DEFAULT 0 NOT NULL, total_ht NUMERIC(12, 2) DEFAULT 0 NOT NULL, block_number VARCHAR(20) DEFAULT NULL, line_type VARCHAR(10) DEFAULT \'RL\' NOT NULL, line_sub_type VARCHAR(10) DEFAULT NULL, display_order INT DEFAULT 0 NOT NULL, order_in_block INT DEFAULT 0 NOT NULL, is_block_header TINYINT DEFAULT 0 NOT NULL, is_block_total TINYINT DEFAULT 0 NOT NULL, is_block_footer TINYINT DEFAULT 0 NOT NULL, is_travaux_supplementaires TINYINT DEFAULT 0 NOT NULL, is_deleted TINYINT DEFAULT 0 NOT NULL, deleted_at DATETIME DEFAULT NULL, devis_avancement_id INT NOT NULL, devis_detail_id INT DEFAULT NULL, INDEX IDX_5199227D485DDAD9 (devis_avancement_id), INDEX IDX_5199227DA903C9C1 (devis_detail_id), PRIMARY KEY (id)) DEFAULT CHARACTER SET utf8mb4 COLLATE `utf8mb4_unicode_ci`');
+        $this->addSql('CREATE TABLE devis_detail (id INT AUTO_INCREMENT NOT NULL, reference VARCHAR(255) DEFAULT NULL, designation LONGTEXT DEFAULT NULL, quantite INT DEFAULT NULL, prix_unitaire DOUBLE PRECISION DEFAULT NULL, coefficient_materiel NUMERIC(10, 2) DEFAULT NULL, total_materiel NUMERIC(10, 2) DEFAULT NULL, mo_unit NUMERIC(10, 2) DEFAULT NULL, coefficient_main_oeuvre NUMERIC(10, 2) DEFAULT NULL, taux_main_oeuvre NUMERIC(10, 2) DEFAULT NULL, mo_total NUMERIC(10, 2) DEFAULT NULL, total NUMERIC(10, 2) DEFAULT NULL, pv_unit NUMERIC(10, 2) DEFAULT NULL, tva NUMERIC(10, 2) DEFAULT NULL, group_id VARCHAR(255) DEFAULT NULL, type VARCHAR(50) DEFAULT NULL, sous_type VARCHAR(50) DEFAULT NULL, bloc VARCHAR(50) DEFAULT NULL, numero_ensemble VARCHAR(50) DEFAULT NULL, temps_de_pose DOUBLE PRECISION DEFAULT NULL, eco_taxe DOUBLE PRECISION DEFAULT NULL, remise DOUBLE PRECISION DEFAULT NULL, unite VARCHAR(50) DEFAULT NULL, zone VARCHAR(50) DEFAULT NULL, code_ventilation1 VARCHAR(50) DEFAULT NULL, code_ventilation2 VARCHAR(50) DEFAULT NULL, block_number VARCHAR(20) DEFAULT NULL, line_type VARCHAR(10) DEFAULT \'RL\' NOT NULL, line_sub_type VARCHAR(10) DEFAULT NULL, is_block_header TINYINT DEFAULT 0 NOT NULL, is_block_total TINYINT DEFAULT 0 NOT NULL, is_block_footer TINYINT DEFAULT 0 NOT NULL, display_order INT DEFAULT 0 NOT NULL, order_in_block INT DEFAULT 0 NOT NULL, is_deleted TINYINT DEFAULT 0 NOT NULL, deleted_at DATETIME DEFAULT NULL, devis_id INT DEFAULT NULL, INDEX IDX_1213B85F41DEFADA (devis_id), PRIMARY KEY (id)) DEFAULT CHARACTER SET utf8mb4 COLLATE `utf8mb4_unicode_ci`');
+        $this->addSql('CREATE TABLE document (id INT AUTO_INCREMENT NOT NULL, nom VARCHAR(255) NOT NULL, created_at DATETIME NOT NULL, PRIMARY KEY (id)) DEFAULT CHARACTER SET utf8mb4 COLLATE `utf8mb4_unicode_ci`');
+        $this->addSql('CREATE TABLE document_type (id INT AUTO_INCREMENT NOT NULL, nom VARCHAR(255) NOT NULL, is_active TINYINT DEFAULT 1 NOT NULL, PRIMARY KEY (id)) DEFAULT CHARACTER SET utf8mb4 COLLATE `utf8mb4_unicode_ci`');
+        $this->addSql('CREATE TABLE entreprise (id INT AUTO_INCREMENT NOT NULL, nom VARCHAR(255) NOT NULL, siret VARCHAR(14) DEFAULT NULL, adresse VARCHAR(255) DEFAULT NULL, code_postal VARCHAR(10) DEFAULT NULL, ville VARCHAR(255) DEFAULT NULL, telephone VARCHAR(20) DEFAULT NULL, email VARCHAR(255) DEFAULT NULL, logo VARCHAR(255) DEFAULT NULL, PRIMARY KEY (id)) DEFAULT CHARACTER SET utf8mb4 COLLATE `utf8mb4_unicode_ci`');
+        $this->addSql('CREATE TABLE facture (id INT AUTO_INCREMENT NOT NULL, numero VARCHAR(50) NOT NULL, date_facture DATE NOT NULL, description LONGTEXT DEFAULT NULL, date_reglement DATE DEFAULT NULL, statut VARCHAR(20) DEFAULT NULL, remarques LONGTEXT DEFAULT NULL, client_id INT NOT NULL, chantier_id INT NOT NULL, INDEX IDX_FE86641019EB6921 (client_id), INDEX IDX_FE866410D0C0049D (chantier_id), PRIMARY KEY (id)) DEFAULT CHARACTER SET utf8mb4 COLLATE `utf8mb4_unicode_ci`');
+        $this->addSql('CREATE TABLE facture_situation (id INT AUTO_INCREMENT NOT NULL, date_situation DATE NOT NULL, numero_facture VARCHAR(50) DEFAULT NULL, titre VARCHAR(255) NOT NULL, soft_delete TINYINT DEFAULT 0 NOT NULL, indice_du_mois DOUBLE PRECISION DEFAULT NULL, num_situation VARCHAR(2) DEFAULT NULL, montant_total_ttc NUMERIC(10, 2) DEFAULT NULL, envoye_at DATETIME DEFAULT NULL, chantier_id INT DEFAULT NULL, created_user_id INT DEFAULT NULL, INDEX IDX_2685A74ED0C0049D (chantier_id), INDEX IDX_2685A74EE104C1D3 (created_user_id), PRIMARY KEY (id)) DEFAULT CHARACTER SET utf8mb4 COLLATE `utf8mb4_unicode_ci`');
+        $this->addSql('CREATE TABLE facture_situation_commentaires (id INT AUTO_INCREMENT NOT NULL, commentaire LONGTEXT NOT NULL, created_at DATETIME NOT NULL, updated_at DATETIME DEFAULT NULL, chantier_id INT NOT NULL, user_id INT NOT NULL, INDEX IDX_8C1588ABD0C0049D (chantier_id), INDEX IDX_8C1588ABA76ED395 (user_id), PRIMARY KEY (id)) DEFAULT CHARACTER SET utf8mb4 COLLATE `utf8mb4_unicode_ci`');
+        $this->addSql('CREATE TABLE facture_situation_coordonnees_bancaire (id INT AUTO_INCREMENT NOT NULL, divers LONGTEXT DEFAULT NULL, iban VARCHAR(50) NOT NULL, banque VARCHAR(50) NOT NULL, situation_id INT NOT NULL, UNIQUE INDEX UNIQ_250C87963408E8AF (situation_id), PRIMARY KEY (id)) DEFAULT CHARACTER SET utf8mb4 COLLATE `utf8mb4_unicode_ci`');
+        $this->addSql('CREATE TABLE facture_situation_detail (id INT AUTO_INCREMENT NOT NULL, designation VARCHAR(255) NOT NULL, montant NUMERIC(10, 2) DEFAULT NULL, cumule NUMERIC(10, 2) DEFAULT NULL, cumule_anterieur NUMERIC(10, 2) DEFAULT NULL, type VARCHAR(50) DEFAULT NULL, groupe VARCHAR(50) NOT NULL, montant_paye NUMERIC(10, 2) DEFAULT NULL, status_paiement VARCHAR(255) DEFAULT NULL, date_paiement DATE DEFAULT NULL, situation_id INT NOT NULL, chantier_id INT DEFAULT NULL, sous_traitent_id INT DEFAULT NULL, INDEX IDX_3B4778623408E8AF (situation_id), INDEX IDX_3B477862D0C0049D (chantier_id), INDEX IDX_3B4778628041068 (sous_traitent_id), PRIMARY KEY (id)) DEFAULT CHARACTER SET utf8mb4 COLLATE `utf8mb4_unicode_ci`');
+        $this->addSql('CREATE TABLE facture_situation_facturation_travaux (id INT AUTO_INCREMENT NOT NULL, type VARCHAR(50) DEFAULT NULL, divers LONGTEXT DEFAULT NULL, designation VARCHAR(100) DEFAULT NULL, montant NUMERIC(10, 2) DEFAULT NULL, cumule NUMERIC(10, 2) DEFAULT NULL, cumule_anterieur NUMERIC(10, 2) DEFAULT NULL, facturation_fin_du_mois NUMERIC(10, 2) DEFAULT NULL, situation_id INT NOT NULL, INDEX IDX_4251FA993408E8AF (situation_id), PRIMARY KEY (id)) DEFAULT CHARACTER SET utf8mb4 COLLATE `utf8mb4_unicode_ci`');
+        $this->addSql('CREATE TABLE facture_situation_paiement (id INT AUTO_INCREMENT NOT NULL, montant NUMERIC(10, 2) NOT NULL, status VARCHAR(255) NOT NULL, date DATE NOT NULL, commentaire LONGTEXT DEFAULT NULL, situation_id INT NOT NULL, INDEX IDX_221F2A003408E8AF (situation_id), PRIMARY KEY (id)) DEFAULT CHARACTER SET utf8mb4 COLLATE `utf8mb4_unicode_ci`');
+        $this->addSql('CREATE TABLE facture_situation_retenue (id INT AUTO_INCREMENT NOT NULL, divers LONGTEXT DEFAULT NULL, designation VARCHAR(100) NOT NULL, montant NUMERIC(10, 2) DEFAULT NULL, cumule NUMERIC(10, 2) DEFAULT NULL, cumule_anterieur NUMERIC(10, 2) DEFAULT NULL, facturation_fin_du_mois NUMERIC(10, 2) DEFAULT NULL, situation_id INT NOT NULL, INDEX IDX_597EBC683408E8AF (situation_id), PRIMARY KEY (id)) DEFAULT CHARACTER SET utf8mb4 COLLATE `utf8mb4_unicode_ci`');
+        $this->addSql('CREATE TABLE facture_situation_sous_traitant (id INT AUTO_INCREMENT NOT NULL, montant_ht NUMERIC(10, 2) NOT NULL, tva NUMERIC(10, 2) DEFAULT NULL, reference VARCHAR(255) DEFAULT NULL, date_contrat DATE DEFAULT NULL, is_declared TINYINT NOT NULL, situation_id INT NOT NULL, sous_traitant_id INT NOT NULL, INDEX IDX_B50DCEC63408E8AF (situation_id), INDEX IDX_B50DCEC69395527E (sous_traitant_id), PRIMARY KEY (id)) DEFAULT CHARACTER SET utf8mb4 COLLATE `utf8mb4_unicode_ci`');
+        $this->addSql('CREATE TABLE facture_situation_total (id INT AUTO_INCREMENT NOT NULL, divers LONGTEXT DEFAULT NULL, designation VARCHAR(100) NOT NULL, montant NUMERIC(10, 2) DEFAULT NULL, cumule NUMERIC(10, 2) DEFAULT NULL, cumule_anterieur NUMERIC(10, 2) DEFAULT NULL, facturation_fin_du_mois NUMERIC(10, 2) DEFAULT NULL, situation_id INT NOT NULL, INDEX IDX_590559033408E8AF (situation_id), PRIMARY KEY (id)) DEFAULT CHARACTER SET utf8mb4 COLLATE `utf8mb4_unicode_ci`');
+        $this->addSql('CREATE TABLE facture_situation_trop_percu (id INT AUTO_INCREMENT NOT NULL, montant NUMERIC(10, 2) NOT NULL, montant_utilise NUMERIC(10, 2) DEFAULT \'0.00\' NOT NULL, status VARCHAR(50) DEFAULT \'disponible\' NOT NULL, date_creation DATETIME NOT NULL, commentaire LONGTEXT DEFAULT NULL, facture_situation_id INT NOT NULL, created_by_id INT NOT NULL, INDEX IDX_A9CC652660D1385D (facture_situation_id), INDEX IDX_A9CC6526B03A8386 (created_by_id), PRIMARY KEY (id)) DEFAULT CHARACTER SET utf8mb4 COLLATE `utf8mb4_unicode_ci`');
+        $this->addSql('CREATE TABLE facture_situation_trop_percu_utilisation (id INT AUTO_INCREMENT NOT NULL, montant NUMERIC(10, 2) NOT NULL, date_utilisation DATETIME NOT NULL, commentaire LONGTEXT DEFAULT NULL, trop_percu_id INT NOT NULL, facture_situation_id INT NOT NULL, utilise_par_id INT NOT NULL, INDEX IDX_129C1047D813933 (trop_percu_id), INDEX IDX_129C104760D1385D (facture_situation_id), INDEX IDX_129C1047740320B9 (utilise_par_id), PRIMARY KEY (id)) DEFAULT CHARACTER SET utf8mb4 COLLATE `utf8mb4_unicode_ci`');
+        $this->addSql('CREATE TABLE forme_juridique (id INT AUTO_INCREMENT NOT NULL, nom VARCHAR(255) NOT NULL, PRIMARY KEY (id)) DEFAULT CHARACTER SET utf8mb4 COLLATE `utf8mb4_unicode_ci`');
+        $this->addSql('CREATE TABLE fournisseur (id INT AUTO_INCREMENT NOT NULL, nom VARCHAR(255) NOT NULL, adresse VARCHAR(255) DEFAULT NULL, code_postal VARCHAR(10) DEFAULT NULL, ville VARCHAR(60) DEFAULT NULL, telephone VARCHAR(25) DEFAULT NULL, email VARCHAR(255) DEFAULT NULL, contact VARCHAR(255) DEFAULT NULL, PRIMARY KEY (id)) DEFAULT CHARACTER SET utf8mb4 COLLATE `utf8mb4_unicode_ci`');
+        $this->addSql('CREATE TABLE fournisseur_contact (id INT AUTO_INCREMENT NOT NULL, nom VARCHAR(255) DEFAULT NULL, prenom VARCHAR(255) DEFAULT NULL, telephone VARCHAR(25) DEFAULT NULL, email VARCHAR(255) DEFAULT NULL, fournisseur_id INT NOT NULL, INDEX IDX_9EA2A995670C757F (fournisseur_id), PRIMARY KEY (id)) DEFAULT CHARACTER SET utf8mb4 COLLATE `utf8mb4_unicode_ci`');
+        $this->addSql('CREATE TABLE libelles (id INT AUTO_INCREMENT NOT NULL, PRIMARY KEY (id)) DEFAULT CHARACTER SET utf8mb4 COLLATE `utf8mb4_unicode_ci`');
+        $this->addSql('CREATE TABLE login_audit (id INT AUTO_INCREMENT NOT NULL, username VARCHAR(180) NOT NULL, ip_address VARCHAR(45) NOT NULL, user_agent VARCHAR(500) DEFAULT NULL, success TINYINT DEFAULT 0 NOT NULL, failure_reason VARCHAR(50) DEFAULT NULL, source VARCHAR(20) DEFAULT \'unknown\' NOT NULL, created_at DATETIME NOT NULL, user_id INT DEFAULT NULL, INDEX IDX_946838EDA76ED395 (user_id), INDEX idx_login_audit_ip (ip_address), INDEX idx_login_audit_username (username), INDEX idx_login_audit_created (created_at), PRIMARY KEY (id)) DEFAULT CHARACTER SET utf8mb4 COLLATE `utf8mb4_unicode_ci`');
+        $this->addSql('CREATE TABLE rappel_facture (id INT AUTO_INCREMENT NOT NULL, montant DOUBLE PRECISION NOT NULL, date_facture DATE NOT NULL, date_limite DATE NOT NULL, is_paid INT NOT NULL, num_facture VARCHAR(50) DEFAULT NULL, file VARCHAR(255) DEFAULT NULL, chantier_id INT NOT NULL, INDEX IDX_B1C23973D0C0049D (chantier_id), PRIMARY KEY (id)) DEFAULT CHARACTER SET utf8mb4 COLLATE `utf8mb4_unicode_ci`');
+        $this->addSql('CREATE TABLE region (id INT AUTO_INCREMENT NOT NULL, nom VARCHAR(255) NOT NULL, PRIMARY KEY (id)) DEFAULT CHARACTER SET utf8mb4 COLLATE `utf8mb4_unicode_ci`');
+        $this->addSql('CREATE TABLE responsable (id INT AUTO_INCREMENT NOT NULL, nom VARCHAR(255) NOT NULL, prenom VARCHAR(255) NOT NULL, email VARCHAR(255) NOT NULL, telephone VARCHAR(20) DEFAULT NULL, PRIMARY KEY (id)) DEFAULT CHARACTER SET utf8mb4 COLLATE `utf8mb4_unicode_ci`');
+        $this->addSql('CREATE TABLE responsable_chantier (responsable_id INT NOT NULL, chantier_id INT NOT NULL, INDEX IDX_47C74BEC53C59D72 (responsable_id), INDEX IDX_47C74BECD0C0049D (chantier_id), PRIMARY KEY (responsable_id, chantier_id)) DEFAULT CHARACTER SET utf8mb4 COLLATE `utf8mb4_unicode_ci`');
+        $this->addSql('CREATE TABLE situation (id INT AUTO_INCREMENT NOT NULL, numero INT NOT NULL, date_debut_periode DATE NOT NULL, date_fin_periode DATE NOT NULL, montant_travaux DOUBLE PRECISION NOT NULL, retenue_garantie DOUBLE PRECISION NOT NULL, montant_tva DOUBLE PRECISION NOT NULL, prorata TINYINT NOT NULL, prorata_percent DOUBLE PRECISION DEFAULT NULL, montant_prorata DOUBLE PRECISION DEFAULT NULL, montant_ht DOUBLE PRECISION NOT NULL, montant_ttc DOUBLE PRECISION NOT NULL, retenue_garantie_percent DOUBLE PRECISION DEFAULT NULL, tva_percent DOUBLE PRECISION DEFAULT NULL, titre VARCHAR(255) DEFAULT NULL, facture_id INT NOT NULL, INDEX IDX_EC2D9ACA7F2DEE08 (facture_id), PRIMARY KEY (id)) DEFAULT CHARACTER SET utf8mb4 COLLATE `utf8mb4_unicode_ci`');
+        $this->addSql('CREATE TABLE situation_commentaires (id INT AUTO_INCREMENT NOT NULL, commentaire LONGTEXT NOT NULL, created_at DATETIME NOT NULL, updated_at DATETIME DEFAULT NULL, facture_situation_id INT NOT NULL, user_id INT NOT NULL, INDEX IDX_426335A560D1385D (facture_situation_id), INDEX IDX_426335A5A76ED395 (user_id), PRIMARY KEY (id)) DEFAULT CHARACTER SET utf8mb4 COLLATE `utf8mb4_unicode_ci`');
+        $this->addSql('CREATE TABLE sous_traitant_avenant (id INT AUTO_INCREMENT NOT NULL, date DATE NOT NULL, created_at DATETIME NOT NULL, updated_at DATETIME DEFAULT NULL, created_user_id INT DEFAULT NULL, contrat_id INT NOT NULL, fichier_id INT DEFAULT NULL, INDEX IDX_52A90AB9E104C1D3 (created_user_id), INDEX IDX_52A90AB91823061F (contrat_id), INDEX IDX_52A90AB9F915CFE (fichier_id), PRIMARY KEY (id)) DEFAULT CHARACTER SET utf8mb4 COLLATE `utf8mb4_unicode_ci`');
+        $this->addSql('CREATE TABLE sous_traitant_contrat (id INT AUTO_INCREMENT NOT NULL, date DATE NOT NULL, created_at DATETIME NOT NULL, updated_at DATETIME DEFAULT NULL, created_user_id INT DEFAULT NULL, sous_traitant_id INT NOT NULL, fichier_id INT DEFAULT NULL, INDEX IDX_3063CFCFE104C1D3 (created_user_id), INDEX IDX_3063CFCF9395527E (sous_traitant_id), INDEX IDX_3063CFCFF915CFE (fichier_id), PRIMARY KEY (id)) DEFAULT CHARACTER SET utf8mb4 COLLATE `utf8mb4_unicode_ci`');
+        $this->addSql('CREATE TABLE sous_traitent (id INT AUTO_INCREMENT NOT NULL, raison_social VARCHAR(255) NOT NULL, nom_gerant VARCHAR(255) DEFAULT NULL, prenom_gerant VARCHAR(255) DEFAULT NULL, email VARCHAR(255) DEFAULT NULL, telephone VARCHAR(25) DEFAULT NULL, siren VARCHAR(100) DEFAULT NULL, siret VARCHAR(100) DEFAULT NULL, created_at DATETIME NOT NULL, updated_at DATETIME DEFAULT NULL, updated_user VARCHAR(255) DEFAULT NULL, slug VARCHAR(255) DEFAULT NULL, adresse VARCHAR(255) DEFAULT NULL, code_postal VARCHAR(20) DEFAULT NULL, ville VARCHAR(255) DEFAULT NULL, rcs VARCHAR(255) DEFAULT NULL, capital VARCHAR(100) DEFAULT NULL, numero_tva VARCHAR(30) DEFAULT NULL, code_naf_ape VARCHAR(25) DEFAULT NULL, date_immat VARCHAR(255) DEFAULT NULL, rib LONGTEXT DEFAULT NULL, banque_adresse LONGTEXT DEFAULT NULL, ex1_date_du DATE DEFAULT NULL, ex1_date_au DATE DEFAULT NULL, ex2_date_du DATE DEFAULT NULL, ex2_date_au DATE DEFAULT NULL, ex3_date_du DATE DEFAULT NULL, ex3_date_au DATE DEFAULT NULL, date_creation DATE DEFAULT NULL, ex1_ca VARCHAR(15) DEFAULT NULL, ex2_ca VARCHAR(15) DEFAULT NULL, ex3_ca VARCHAR(15) DEFAULT NULL, forme_juridique_id INT DEFAULT NULL, INDEX IDX_6F5CB19B9AEE68EB (forme_juridique_id), PRIMARY KEY (id)) DEFAULT CHARACTER SET utf8mb4 COLLATE `utf8mb4_unicode_ci`');
+        $this->addSql('CREATE TABLE suivi_facture (id INT AUTO_INCREMENT NOT NULL, date_facture DATE DEFAULT NULL, facture_numero VARCHAR(255) NOT NULL, montant_ht DOUBLE PRECISION DEFAULT NULL, manque_reglement_ttc DOUBLE PRECISION DEFAULT NULL, penalites_revision_prix DOUBLE PRECISION DEFAULT NULL, total_apayer_ttc DOUBLE PRECISION DEFAULT NULL, date_reglement DATE DEFAULT NULL, remarques LONGTEXT DEFAULT NULL, prorata INT DEFAULT NULL, prorata_percent INT DEFAULT NULL, rg_ht INT DEFAULT NULL, tva INT DEFAULT NULL, client_id INT DEFAULT NULL, chantier_id INT DEFAULT NULL, INDEX IDX_7B4190B519EB6921 (client_id), INDEX IDX_7B4190B5D0C0049D (chantier_id), PRIMARY KEY (id)) DEFAULT CHARACTER SET utf8mb4 COLLATE `utf8mb4_unicode_ci`');
+        $this->addSql('CREATE TABLE type_libelles (id INT AUTO_INCREMENT NOT NULL, categorie VARCHAR(255) NOT NULL, valeur VARCHAR(255) NOT NULL, entity VARCHAR(255) DEFAULT NULL, PRIMARY KEY (id)) DEFAULT CHARACTER SET utf8mb4 COLLATE `utf8mb4_unicode_ci`');
+        $this->addSql('CREATE TABLE uploads (id INT AUTO_INCREMENT NOT NULL, entity_id INT DEFAULT NULL, file_name VARCHAR(255) NOT NULL, unique_file_name VARCHAR(255) DEFAULT NULL, created_at DATETIME DEFAULT NULL, entity_type VARCHAR(255) DEFAULT NULL, upload_option VARCHAR(25) DEFAULT NULL, soft_delete TINYINT DEFAULT 0 NOT NULL, document_type_id INT DEFAULT NULL, created_user_id INT DEFAULT NULL, INDEX IDX_96117F1861232A4F (document_type_id), INDEX IDX_96117F18E104C1D3 (created_user_id), PRIMARY KEY (id)) DEFAULT CHARACTER SET utf8mb4 COLLATE `utf8mb4_unicode_ci`');
+        $this->addSql('CREATE TABLE user (id INT AUTO_INCREMENT NOT NULL, username VARCHAR(180) NOT NULL, roles JSON NOT NULL, password VARCHAR(255) NOT NULL, nom VARCHAR(255) NOT NULL, prenom VARCHAR(255) DEFAULT NULL, telephone VARCHAR(30) DEFAULT NULL, adresse VARCHAR(150) DEFAULT NULL, code_postal VARCHAR(15) DEFAULT NULL, ville VARCHAR(150) DEFAULT NULL, email VARCHAR(255) DEFAULT NULL, menu_toggel INT DEFAULT 0 NOT NULL, is_active TINYINT DEFAULT 1 NOT NULL, failed_login_attempts INT DEFAULT 0 NOT NULL, locked_until DATETIME DEFAULT NULL, last_login_at DATETIME DEFAULT NULL, suivi INT DEFAULT NULL, taux_horaire DOUBLE PRECISION DEFAULT NULL, fonction_id INT DEFAULT NULL, INDEX IDX_8D93D64957889920 (fonction_id), UNIQUE INDEX UNIQ_IDENTIFIER_USERNAME (username), PRIMARY KEY (id)) DEFAULT CHARACTER SET utf8mb4 COLLATE `utf8mb4_unicode_ci`');
+        $this->addSql('ALTER TABLE avancement ADD CONSTRAINT FK_6D2A7A2AD0C0049D FOREIGN KEY (chantier_id) REFERENCES chantier (id)');
+        $this->addSql('ALTER TABLE bon_commande ADD CONSTRAINT FK_159D9576D0C0049D FOREIGN KEY (chantier_id) REFERENCES chantier (id)');
+        $this->addSql('ALTER TABLE bon_commande ADD CONSTRAINT FK_159D957685564492 FOREIGN KEY (create_user_id) REFERENCES user (id)');
+        $this->addSql('ALTER TABLE bon_commande ADD CONSTRAINT FK_159D9576519BD316 FOREIGN KEY (validate_user_id) REFERENCES user (id)');
+        $this->addSql('ALTER TABLE bon_commande ADD CONSTRAINT FK_159D9576670C757F FOREIGN KEY (fournisseur_id) REFERENCES fournisseur (id)');
+        $this->addSql('ALTER TABLE bon_commande ADD CONSTRAINT FK_159D9576DA847AD1 FOREIGN KEY (fournisseur_contact_id) REFERENCES fournisseur_contact (id)');
+        $this->addSql('ALTER TABLE bon_commande ADD CONSTRAINT FK_159D9576EF83D36D FOREIGN KEY (sent_founisseur_contact_id) REFERENCES contacts (id)');
+        $this->addSql('ALTER TABLE bon_commande_article ADD CONSTRAINT FK_A84533F8B4B54061 FOREIGN KEY (bon_commande_id) REFERENCES bon_commande (id)');
+        $this->addSql('ALTER TABLE chantier ADD CONSTRAINT FK_636F27F698260155 FOREIGN KEY (region_id) REFERENCES region (id)');
+        $this->addSql('ALTER TABLE chantier ADD CONSTRAINT FK_636F27F630D428B9 FOREIGN KEY (type_calcul_id) REFERENCES type_libelles (id)');
+        $this->addSql('ALTER TABLE chantier ADD CONSTRAINT FK_636F27F619EB6921 FOREIGN KEY (client_id) REFERENCES client (id)');
+        $this->addSql('ALTER TABLE chantier_responsable ADD CONSTRAINT FK_4DFA8CC553C59D72 FOREIGN KEY (responsable_id) REFERENCES user (id)');
+        $this->addSql('ALTER TABLE chantier_responsable ADD CONSTRAINT FK_4DFA8CC5D0C0049D FOREIGN KEY (chantier_id) REFERENCES chantier (id)');
+        $this->addSql('ALTER TABLE chantier_sous_traitent ADD CONSTRAINT FK_C2FA849D0C0049D FOREIGN KEY (chantier_id) REFERENCES chantier (id)');
+        $this->addSql('ALTER TABLE chantier_sous_traitent ADD CONSTRAINT FK_C2FA8498041068 FOREIGN KEY (sous_traitent_id) REFERENCES sous_traitent (id)');
+        $this->addSql('ALTER TABLE client ADD CONSTRAINT FK_C74404559AEE68EB FOREIGN KEY (forme_juridique_id) REFERENCES forme_juridique (id)');
+        $this->addSql('ALTER TABLE client ADD CONSTRAINT FK_C7440455CB94D64E FOREIGN KEY (affiliation_id) REFERENCES client (id)');
+        $this->addSql('ALTER TABLE devis ADD CONSTRAINT FK_8B27C52BD0C0049D FOREIGN KEY (chantier_id) REFERENCES chantier (id)');
+        $this->addSql('ALTER TABLE devis ADD CONSTRAINT FK_8B27C52BB03A8386 FOREIGN KEY (created_by_id) REFERENCES user (id)');
+        $this->addSql('ALTER TABLE devis_avancement ADD CONSTRAINT FK_DD8B31C241DEFADA FOREIGN KEY (devis_id) REFERENCES devis (id)');
+        $this->addSql('ALTER TABLE devis_avancement ADD CONSTRAINT FK_DD8B31C2B03A8386 FOREIGN KEY (created_by_id) REFERENCES user (id)');
+        $this->addSql('ALTER TABLE devis_avancement ADD CONSTRAINT FK_DD8B31C260D1385D FOREIGN KEY (facture_situation_id) REFERENCES facture_situation (id)');
+        $this->addSql('ALTER TABLE devis_avancement_detail ADD CONSTRAINT FK_5199227D485DDAD9 FOREIGN KEY (devis_avancement_id) REFERENCES devis_avancement (id)');
+        $this->addSql('ALTER TABLE devis_avancement_detail ADD CONSTRAINT FK_5199227DA903C9C1 FOREIGN KEY (devis_detail_id) REFERENCES devis_detail (id)');
+        $this->addSql('ALTER TABLE devis_detail ADD CONSTRAINT FK_1213B85F41DEFADA FOREIGN KEY (devis_id) REFERENCES devis (id)');
+        $this->addSql('ALTER TABLE facture ADD CONSTRAINT FK_FE86641019EB6921 FOREIGN KEY (client_id) REFERENCES client (id)');
+        $this->addSql('ALTER TABLE facture ADD CONSTRAINT FK_FE866410D0C0049D FOREIGN KEY (chantier_id) REFERENCES chantier (id)');
+        $this->addSql('ALTER TABLE facture_situation ADD CONSTRAINT FK_2685A74ED0C0049D FOREIGN KEY (chantier_id) REFERENCES chantier (id)');
+        $this->addSql('ALTER TABLE facture_situation ADD CONSTRAINT FK_2685A74EE104C1D3 FOREIGN KEY (created_user_id) REFERENCES user (id)');
+        $this->addSql('ALTER TABLE facture_situation_commentaires ADD CONSTRAINT FK_8C1588ABD0C0049D FOREIGN KEY (chantier_id) REFERENCES chantier (id) ON DELETE CASCADE');
+        $this->addSql('ALTER TABLE facture_situation_commentaires ADD CONSTRAINT FK_8C1588ABA76ED395 FOREIGN KEY (user_id) REFERENCES user (id)');
+        $this->addSql('ALTER TABLE facture_situation_coordonnees_bancaire ADD CONSTRAINT FK_250C87963408E8AF FOREIGN KEY (situation_id) REFERENCES facture_situation (id)');
+        $this->addSql('ALTER TABLE facture_situation_detail ADD CONSTRAINT FK_3B4778623408E8AF FOREIGN KEY (situation_id) REFERENCES facture_situation (id)');
+        $this->addSql('ALTER TABLE facture_situation_detail ADD CONSTRAINT FK_3B477862D0C0049D FOREIGN KEY (chantier_id) REFERENCES chantier (id)');
+        $this->addSql('ALTER TABLE facture_situation_detail ADD CONSTRAINT FK_3B4778628041068 FOREIGN KEY (sous_traitent_id) REFERENCES sous_traitent (id)');
+        $this->addSql('ALTER TABLE facture_situation_facturation_travaux ADD CONSTRAINT FK_4251FA993408E8AF FOREIGN KEY (situation_id) REFERENCES facture_situation (id)');
+        $this->addSql('ALTER TABLE facture_situation_paiement ADD CONSTRAINT FK_221F2A003408E8AF FOREIGN KEY (situation_id) REFERENCES facture_situation (id)');
+        $this->addSql('ALTER TABLE facture_situation_retenue ADD CONSTRAINT FK_597EBC683408E8AF FOREIGN KEY (situation_id) REFERENCES facture_situation (id)');
+        $this->addSql('ALTER TABLE facture_situation_sous_traitant ADD CONSTRAINT FK_B50DCEC63408E8AF FOREIGN KEY (situation_id) REFERENCES facture_situation (id)');
+        $this->addSql('ALTER TABLE facture_situation_sous_traitant ADD CONSTRAINT FK_B50DCEC69395527E FOREIGN KEY (sous_traitant_id) REFERENCES sous_traitent (id)');
+        $this->addSql('ALTER TABLE facture_situation_total ADD CONSTRAINT FK_590559033408E8AF FOREIGN KEY (situation_id) REFERENCES facture_situation (id)');
+        $this->addSql('ALTER TABLE facture_situation_trop_percu ADD CONSTRAINT FK_A9CC652660D1385D FOREIGN KEY (facture_situation_id) REFERENCES facture_situation (id) ON DELETE CASCADE');
+        $this->addSql('ALTER TABLE facture_situation_trop_percu ADD CONSTRAINT FK_A9CC6526B03A8386 FOREIGN KEY (created_by_id) REFERENCES user (id)');
+        $this->addSql('ALTER TABLE facture_situation_trop_percu_utilisation ADD CONSTRAINT FK_129C1047D813933 FOREIGN KEY (trop_percu_id) REFERENCES facture_situation_trop_percu (id) ON DELETE CASCADE');
+        $this->addSql('ALTER TABLE facture_situation_trop_percu_utilisation ADD CONSTRAINT FK_129C104760D1385D FOREIGN KEY (facture_situation_id) REFERENCES facture_situation (id) ON DELETE CASCADE');
+        $this->addSql('ALTER TABLE facture_situation_trop_percu_utilisation ADD CONSTRAINT FK_129C1047740320B9 FOREIGN KEY (utilise_par_id) REFERENCES user (id)');
+        $this->addSql('ALTER TABLE fournisseur_contact ADD CONSTRAINT FK_9EA2A995670C757F FOREIGN KEY (fournisseur_id) REFERENCES fournisseur (id)');
+        $this->addSql('ALTER TABLE login_audit ADD CONSTRAINT FK_946838EDA76ED395 FOREIGN KEY (user_id) REFERENCES user (id) ON DELETE SET NULL');
+        $this->addSql('ALTER TABLE rappel_facture ADD CONSTRAINT FK_B1C23973D0C0049D FOREIGN KEY (chantier_id) REFERENCES chantier (id)');
+        $this->addSql('ALTER TABLE responsable_chantier ADD CONSTRAINT FK_47C74BEC53C59D72 FOREIGN KEY (responsable_id) REFERENCES responsable (id) ON DELETE CASCADE');
+        $this->addSql('ALTER TABLE responsable_chantier ADD CONSTRAINT FK_47C74BECD0C0049D FOREIGN KEY (chantier_id) REFERENCES chantier (id) ON DELETE CASCADE');
+        $this->addSql('ALTER TABLE situation ADD CONSTRAINT FK_EC2D9ACA7F2DEE08 FOREIGN KEY (facture_id) REFERENCES facture (id)');
+        $this->addSql('ALTER TABLE situation_commentaires ADD CONSTRAINT FK_426335A560D1385D FOREIGN KEY (facture_situation_id) REFERENCES facture_situation (id) ON DELETE CASCADE');
+        $this->addSql('ALTER TABLE situation_commentaires ADD CONSTRAINT FK_426335A5A76ED395 FOREIGN KEY (user_id) REFERENCES user (id)');
+        $this->addSql('ALTER TABLE sous_traitant_avenant ADD CONSTRAINT FK_52A90AB9E104C1D3 FOREIGN KEY (created_user_id) REFERENCES user (id)');
+        $this->addSql('ALTER TABLE sous_traitant_avenant ADD CONSTRAINT FK_52A90AB91823061F FOREIGN KEY (contrat_id) REFERENCES sous_traitant_contrat (id)');
+        $this->addSql('ALTER TABLE sous_traitant_avenant ADD CONSTRAINT FK_52A90AB9F915CFE FOREIGN KEY (fichier_id) REFERENCES uploads (id)');
+        $this->addSql('ALTER TABLE sous_traitant_contrat ADD CONSTRAINT FK_3063CFCFE104C1D3 FOREIGN KEY (created_user_id) REFERENCES user (id)');
+        $this->addSql('ALTER TABLE sous_traitant_contrat ADD CONSTRAINT FK_3063CFCF9395527E FOREIGN KEY (sous_traitant_id) REFERENCES sous_traitent (id)');
+        $this->addSql('ALTER TABLE sous_traitant_contrat ADD CONSTRAINT FK_3063CFCFF915CFE FOREIGN KEY (fichier_id) REFERENCES uploads (id)');
+        $this->addSql('ALTER TABLE sous_traitent ADD CONSTRAINT FK_6F5CB19B9AEE68EB FOREIGN KEY (forme_juridique_id) REFERENCES forme_juridique (id)');
+        $this->addSql('ALTER TABLE suivi_facture ADD CONSTRAINT FK_7B4190B519EB6921 FOREIGN KEY (client_id) REFERENCES client (id)');
+        $this->addSql('ALTER TABLE suivi_facture ADD CONSTRAINT FK_7B4190B5D0C0049D FOREIGN KEY (chantier_id) REFERENCES chantier (id)');
+        $this->addSql('ALTER TABLE uploads ADD CONSTRAINT FK_96117F1861232A4F FOREIGN KEY (document_type_id) REFERENCES document_type (id)');
+        $this->addSql('ALTER TABLE uploads ADD CONSTRAINT FK_96117F18E104C1D3 FOREIGN KEY (created_user_id) REFERENCES user (id)');
+        $this->addSql('ALTER TABLE user ADD CONSTRAINT FK_8D93D64957889920 FOREIGN KEY (fonction_id) REFERENCES type_libelles (id)');
+    }
+
+    public function down(Schema $schema): void
+    {
+        // this down() migration is auto-generated, please modify it to your needs
+        $this->addSql('ALTER TABLE avancement DROP FOREIGN KEY FK_6D2A7A2AD0C0049D');
+        $this->addSql('ALTER TABLE bon_commande DROP FOREIGN KEY FK_159D9576D0C0049D');
+        $this->addSql('ALTER TABLE bon_commande DROP FOREIGN KEY FK_159D957685564492');
+        $this->addSql('ALTER TABLE bon_commande DROP FOREIGN KEY FK_159D9576519BD316');
+        $this->addSql('ALTER TABLE bon_commande DROP FOREIGN KEY FK_159D9576670C757F');
+        $this->addSql('ALTER TABLE bon_commande DROP FOREIGN KEY FK_159D9576DA847AD1');
+        $this->addSql('ALTER TABLE bon_commande DROP FOREIGN KEY FK_159D9576EF83D36D');
+        $this->addSql('ALTER TABLE bon_commande_article DROP FOREIGN KEY FK_A84533F8B4B54061');
+        $this->addSql('ALTER TABLE chantier DROP FOREIGN KEY FK_636F27F698260155');
+        $this->addSql('ALTER TABLE chantier DROP FOREIGN KEY FK_636F27F630D428B9');
+        $this->addSql('ALTER TABLE chantier DROP FOREIGN KEY FK_636F27F619EB6921');
+        $this->addSql('ALTER TABLE chantier_responsable DROP FOREIGN KEY FK_4DFA8CC553C59D72');
+        $this->addSql('ALTER TABLE chantier_responsable DROP FOREIGN KEY FK_4DFA8CC5D0C0049D');
+        $this->addSql('ALTER TABLE chantier_sous_traitent DROP FOREIGN KEY FK_C2FA849D0C0049D');
+        $this->addSql('ALTER TABLE chantier_sous_traitent DROP FOREIGN KEY FK_C2FA8498041068');
+        $this->addSql('ALTER TABLE client DROP FOREIGN KEY FK_C74404559AEE68EB');
+        $this->addSql('ALTER TABLE client DROP FOREIGN KEY FK_C7440455CB94D64E');
+        $this->addSql('ALTER TABLE devis DROP FOREIGN KEY FK_8B27C52BD0C0049D');
+        $this->addSql('ALTER TABLE devis DROP FOREIGN KEY FK_8B27C52BB03A8386');
+        $this->addSql('ALTER TABLE devis_avancement DROP FOREIGN KEY FK_DD8B31C241DEFADA');
+        $this->addSql('ALTER TABLE devis_avancement DROP FOREIGN KEY FK_DD8B31C2B03A8386');
+        $this->addSql('ALTER TABLE devis_avancement DROP FOREIGN KEY FK_DD8B31C260D1385D');
+        $this->addSql('ALTER TABLE devis_avancement_detail DROP FOREIGN KEY FK_5199227D485DDAD9');
+        $this->addSql('ALTER TABLE devis_avancement_detail DROP FOREIGN KEY FK_5199227DA903C9C1');
+        $this->addSql('ALTER TABLE devis_detail DROP FOREIGN KEY FK_1213B85F41DEFADA');
+        $this->addSql('ALTER TABLE facture DROP FOREIGN KEY FK_FE86641019EB6921');
+        $this->addSql('ALTER TABLE facture DROP FOREIGN KEY FK_FE866410D0C0049D');
+        $this->addSql('ALTER TABLE facture_situation DROP FOREIGN KEY FK_2685A74ED0C0049D');
+        $this->addSql('ALTER TABLE facture_situation DROP FOREIGN KEY FK_2685A74EE104C1D3');
+        $this->addSql('ALTER TABLE facture_situation_commentaires DROP FOREIGN KEY FK_8C1588ABD0C0049D');
+        $this->addSql('ALTER TABLE facture_situation_commentaires DROP FOREIGN KEY FK_8C1588ABA76ED395');
+        $this->addSql('ALTER TABLE facture_situation_coordonnees_bancaire DROP FOREIGN KEY FK_250C87963408E8AF');
+        $this->addSql('ALTER TABLE facture_situation_detail DROP FOREIGN KEY FK_3B4778623408E8AF');
+        $this->addSql('ALTER TABLE facture_situation_detail DROP FOREIGN KEY FK_3B477862D0C0049D');
+        $this->addSql('ALTER TABLE facture_situation_detail DROP FOREIGN KEY FK_3B4778628041068');
+        $this->addSql('ALTER TABLE facture_situation_facturation_travaux DROP FOREIGN KEY FK_4251FA993408E8AF');
+        $this->addSql('ALTER TABLE facture_situation_paiement DROP FOREIGN KEY FK_221F2A003408E8AF');
+        $this->addSql('ALTER TABLE facture_situation_retenue DROP FOREIGN KEY FK_597EBC683408E8AF');
+        $this->addSql('ALTER TABLE facture_situation_sous_traitant DROP FOREIGN KEY FK_B50DCEC63408E8AF');
+        $this->addSql('ALTER TABLE facture_situation_sous_traitant DROP FOREIGN KEY FK_B50DCEC69395527E');
+        $this->addSql('ALTER TABLE facture_situation_total DROP FOREIGN KEY FK_590559033408E8AF');
+        $this->addSql('ALTER TABLE facture_situation_trop_percu DROP FOREIGN KEY FK_A9CC652660D1385D');
+        $this->addSql('ALTER TABLE facture_situation_trop_percu DROP FOREIGN KEY FK_A9CC6526B03A8386');
+        $this->addSql('ALTER TABLE facture_situation_trop_percu_utilisation DROP FOREIGN KEY FK_129C1047D813933');
+        $this->addSql('ALTER TABLE facture_situation_trop_percu_utilisation DROP FOREIGN KEY FK_129C104760D1385D');
+        $this->addSql('ALTER TABLE facture_situation_trop_percu_utilisation DROP FOREIGN KEY FK_129C1047740320B9');
+        $this->addSql('ALTER TABLE fournisseur_contact DROP FOREIGN KEY FK_9EA2A995670C757F');
+        $this->addSql('ALTER TABLE login_audit DROP FOREIGN KEY FK_946838EDA76ED395');
+        $this->addSql('ALTER TABLE rappel_facture DROP FOREIGN KEY FK_B1C23973D0C0049D');
+        $this->addSql('ALTER TABLE responsable_chantier DROP FOREIGN KEY FK_47C74BEC53C59D72');
+        $this->addSql('ALTER TABLE responsable_chantier DROP FOREIGN KEY FK_47C74BECD0C0049D');
+        $this->addSql('ALTER TABLE situation DROP FOREIGN KEY FK_EC2D9ACA7F2DEE08');
+        $this->addSql('ALTER TABLE situation_commentaires DROP FOREIGN KEY FK_426335A560D1385D');
+        $this->addSql('ALTER TABLE situation_commentaires DROP FOREIGN KEY FK_426335A5A76ED395');
+        $this->addSql('ALTER TABLE sous_traitant_avenant DROP FOREIGN KEY FK_52A90AB9E104C1D3');
+        $this->addSql('ALTER TABLE sous_traitant_avenant DROP FOREIGN KEY FK_52A90AB91823061F');
+        $this->addSql('ALTER TABLE sous_traitant_avenant DROP FOREIGN KEY FK_52A90AB9F915CFE');
+        $this->addSql('ALTER TABLE sous_traitant_contrat DROP FOREIGN KEY FK_3063CFCFE104C1D3');
+        $this->addSql('ALTER TABLE sous_traitant_contrat DROP FOREIGN KEY FK_3063CFCF9395527E');
+        $this->addSql('ALTER TABLE sous_traitant_contrat DROP FOREIGN KEY FK_3063CFCFF915CFE');
+        $this->addSql('ALTER TABLE sous_traitent DROP FOREIGN KEY FK_6F5CB19B9AEE68EB');
+        $this->addSql('ALTER TABLE suivi_facture DROP FOREIGN KEY FK_7B4190B519EB6921');
+        $this->addSql('ALTER TABLE suivi_facture DROP FOREIGN KEY FK_7B4190B5D0C0049D');
+        $this->addSql('ALTER TABLE uploads DROP FOREIGN KEY FK_96117F1861232A4F');
+        $this->addSql('ALTER TABLE uploads DROP FOREIGN KEY FK_96117F18E104C1D3');
+        $this->addSql('ALTER TABLE user DROP FOREIGN KEY FK_8D93D64957889920');
+        $this->addSql('DROP TABLE avancement');
+        $this->addSql('DROP TABLE bon_commande');
+        $this->addSql('DROP TABLE bon_commande_article');
+        $this->addSql('DROP TABLE chantier');
+        $this->addSql('DROP TABLE chantier_responsable');
+        $this->addSql('DROP TABLE chantier_sous_traitent');
+        $this->addSql('DROP TABLE client');
+        $this->addSql('DROP TABLE contacts');
+        $this->addSql('DROP TABLE devis');
+        $this->addSql('DROP TABLE devis_avancement');
+        $this->addSql('DROP TABLE devis_avancement_detail');
+        $this->addSql('DROP TABLE devis_detail');
+        $this->addSql('DROP TABLE document');
+        $this->addSql('DROP TABLE document_type');
+        $this->addSql('DROP TABLE entreprise');
+        $this->addSql('DROP TABLE facture');
+        $this->addSql('DROP TABLE facture_situation');
+        $this->addSql('DROP TABLE facture_situation_commentaires');
+        $this->addSql('DROP TABLE facture_situation_coordonnees_bancaire');
+        $this->addSql('DROP TABLE facture_situation_detail');
+        $this->addSql('DROP TABLE facture_situation_facturation_travaux');
+        $this->addSql('DROP TABLE facture_situation_paiement');
+        $this->addSql('DROP TABLE facture_situation_retenue');
+        $this->addSql('DROP TABLE facture_situation_sous_traitant');
+        $this->addSql('DROP TABLE facture_situation_total');
+        $this->addSql('DROP TABLE facture_situation_trop_percu');
+        $this->addSql('DROP TABLE facture_situation_trop_percu_utilisation');
+        $this->addSql('DROP TABLE forme_juridique');
+        $this->addSql('DROP TABLE fournisseur');
+        $this->addSql('DROP TABLE fournisseur_contact');
+        $this->addSql('DROP TABLE libelles');
+        $this->addSql('DROP TABLE login_audit');
+        $this->addSql('DROP TABLE rappel_facture');
+        $this->addSql('DROP TABLE region');
+        $this->addSql('DROP TABLE responsable');
+        $this->addSql('DROP TABLE responsable_chantier');
+        $this->addSql('DROP TABLE situation');
+        $this->addSql('DROP TABLE situation_commentaires');
+        $this->addSql('DROP TABLE sous_traitant_avenant');
+        $this->addSql('DROP TABLE sous_traitant_contrat');
+        $this->addSql('DROP TABLE sous_traitent');
+        $this->addSql('DROP TABLE suivi_facture');
+        $this->addSql('DROP TABLE type_libelles');
+        $this->addSql('DROP TABLE uploads');
+        $this->addSql('DROP TABLE user');
+    }
+}

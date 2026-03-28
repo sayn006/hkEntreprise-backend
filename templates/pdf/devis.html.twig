@@ -1,0 +1,160 @@
+{% extends 'pdf/_base.html.twig' %}
+
+{% block title %}Devis {{ devis.numero }}{% endblock %}
+
+{% block header_right %}
+    <div style="background: #e8eaf6; border-radius: 4px; padding: 10px 14px; display: inline-block; text-align: right;">
+        <div style="font-size: 8px; text-transform: uppercase; color: #888; margin-bottom: 4px;">N° DEVIS</div>
+        <div style="font-size: 16px; font-weight: bold; color: #1a237e;">{{ devis.numero }}</div>
+        <div style="font-size: 9px; color: #555; margin-top: 4px;">
+            Date : {{ devis.dateCreation ? devis.dateCreation|date('d/m/Y') : 'N/A' }}
+        </div>
+    </div>
+{% endblock %}
+
+{% block content %}
+
+    {# ===== DESTINATAIRE ===== #}
+    <div class="clearfix">
+        {% set client = devis.chantier ? devis.chantier.client : null %}
+        {% if client %}
+        <div class="recipient-block">
+            <div class="recipient-label">Destinataire</div>
+            <div class="recipient-name">{{ client.raisonSocial }}</div>
+            <div class="recipient-info">
+                {% if client.adresse %}{{ client.adresse }}<br>{% endif %}
+                {% if client.codePostal or client.ville %}{{ client.codePostal }} {{ client.ville }}<br>{% endif %}
+                {% if client.telephone %}Tél : {{ client.telephone }}<br>{% endif %}
+                {% if client.email %}{{ client.email }}{% endif %}
+            </div>
+        </div>
+        {% endif %}
+    </div>
+
+    {# ===== TITRE ===== #}
+    <div class="document-title">
+        <h1>DEVIS</h1>
+        <div class="document-meta">
+            <span>{{ devis.titre }}</span>
+            <span style="text-align: right;">
+                {% if devis.chantier %}Chantier : {{ devis.chantier.code }} — {{ devis.chantier.nom }}{% endif %}
+            </span>
+        </div>
+    </div>
+
+    {# ===== INFOS CHANTIER ===== #}
+    {% if devis.chantier is not null %}
+    <div class="info-section">
+        <div class="info-section-title">Chantier</div>
+        <div style="font-size: 9px; line-height: 1.6;">
+            {% if devis.chantier.code is defined %}<strong>{{ devis.chantier.code }}</strong>{% endif %}
+            {% if devis.chantier.nom is defined %} — {{ devis.chantier.nom }}{% endif %}
+        </div>
+    </div>
+    {% endif %}
+
+    {# ===== LIGNES DE DEVIS ===== #}
+    <table class="details-table">
+        <thead>
+            <tr>
+                <th style="width: 8%;">Réf.</th>
+                <th style="width: 42%;">Désignation</th>
+                <th style="width: 8%;" class="text-center">Qté</th>
+                <th style="width: 7%;" class="text-center">Unité</th>
+                <th style="width: 15%;" class="text-right">P.U. HT</th>
+                <th style="width: 15%;" class="text-right">Total HT</th>
+                <th style="width: 5%;" class="text-center">TVA</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% set totalHT = 0 %}
+            {% set tvaMap = {} %}
+
+            {% for detail in details %}
+                {% if detail.lineType == 'BH' %}
+                    {# En-tête de bloc #}
+                    {% set blocTotal = 0 %}
+                    {% for d in details %}
+                        {% if d.blockNumber == detail.blockNumber and d.lineType == 'RL' %}
+                            {% set lt = (d.quantite|default(0)) * (d.prixUnitaire|default(0)) %}
+                            {% set blocTotal = blocTotal + lt %}
+                        {% endif %}
+                    {% endfor %}
+                    <tr class="bloc-row">
+                        <td></td>
+                        <td colspan="4"><strong>{{ detail.designation }}</strong></td>
+                        <td class="text-right">
+                            {% if blocTotal > 0 %}<strong>{{ blocTotal|number_format(2, ',', ' ') }} €</strong>{% endif %}
+                        </td>
+                        <td></td>
+                    </tr>
+                {% elseif detail.lineType == 'RL' %}
+                    {# Ligne normale #}
+                    {% set lineTotal = (detail.quantite|default(0)) * (detail.prixUnitaire|default(0)) %}
+                    {% set totalHT = totalHT + lineTotal %}
+                    {% if detail.tva %}
+                        {% set tvaKey = detail.tva %}
+                        {% if attribute(tvaMap, tvaKey) is defined %}
+                            {% set tvaMap = tvaMap|merge({(tvaKey): attribute(tvaMap, tvaKey) + lineTotal}) %}
+                        {% else %}
+                            {% set tvaMap = tvaMap|merge({(tvaKey): lineTotal}) %}
+                        {% endif %}
+                    {% endif %}
+                    <tr class="{{ detail.blockNumber ? '' : 'hors-bloc' }}">
+                        <td>{{ detail.reference }}</td>
+                        <td>{{ detail.designation }}</td>
+                        <td class="text-center">{{ detail.quantite }}</td>
+                        <td class="text-center">{{ detail.unite }}</td>
+                        <td class="text-right">{{ detail.prixUnitaire ? detail.prixUnitaire|number_format(2, ',', ' ') ~ ' €' : '' }}</td>
+                        <td class="text-right">{{ lineTotal > 0 ? lineTotal|number_format(2, ',', ' ') ~ ' €' : '' }}</td>
+                        <td class="text-center">{{ detail.tva ? detail.tva ~ '%' : '' }}</td>
+                    </tr>
+                {% elseif detail.lineType == 'C' %}
+                    {# Commentaire #}
+                    <tr>
+                        <td></td>
+                        <td colspan="6" style="color: #666; font-style: italic;">{{ detail.designation }}</td>
+                    </tr>
+                {% endif %}
+            {% else %}
+                <tr>
+                    <td colspan="7" style="text-align: center; padding: 20px; color: #aaa;">
+                        Aucune ligne dans ce devis
+                    </td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    {# ===== TOTAUX ===== #}
+    {% set totalTVA = 0 %}
+    <div class="totals-section">
+        <div class="totals-spacer"></div>
+        <div class="totals-box">
+            <div class="total-row">
+                <span class="total-label">Total HT</span>
+                <span class="total-value">{{ totalHT|number_format(2, ',', ' ') }} €</span>
+            </div>
+            {% for tvaRate, base in tvaMap %}
+                {% set tvaAmount = base * (tvaRate / 100) %}
+                {% set totalTVA = totalTVA + tvaAmount %}
+                <div class="total-row">
+                    <span class="total-label">TVA {{ tvaRate }}%</span>
+                    <span class="total-value">{{ tvaAmount|number_format(2, ',', ' ') }} €</span>
+                </div>
+            {% endfor %}
+            {% if tvaMap is empty %}
+                {% set totalTVA = totalHT * 0.20 %}
+                <div class="total-row">
+                    <span class="total-label">TVA (20%)</span>
+                    <span class="total-value">{{ totalTVA|number_format(2, ',', ' ') }} €</span>
+                </div>
+            {% endif %}
+            <div class="total-row total-ttc">
+                <span class="total-label">TOTAL TTC</span>
+                <span class="total-value">{{ (totalHT + totalTVA)|number_format(2, ',', ' ') }} €</span>
+            </div>
+        </div>
+    </div>
+
+{% endblock %}

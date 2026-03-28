@@ -21,3 +21,15 @@ services:
 
     # add more service definitions when explicit configuration is needed
     # please note that last definitions always *replace* previous ones
+
+    App\State\DevisAcceptationProcessor:
+        bind:
+            $innerProcessor: '@api_platform.doctrine.orm.state.persist_processor'
+
+    App\State\SituationGenerationProcessor:
+        bind:
+            $innerProcessor: '@api_platform.doctrine.orm.state.persist_processor'
+
+    App\State\AvancementCreationProcessor:
+        bind:
+            $innerProcessor: '@api_platform.doctrine.orm.state.persist_processor'

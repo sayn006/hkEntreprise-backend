@@ -1,0 +1,124 @@
+{% extends 'pdf/_base.html.twig' %}
+
+{% block title %}Facture {{ facture.numero }}{% endblock %}
+
+{% block header_right %}
+    <div style="background: #e8eaf6; border-radius: 4px; padding: 10px 14px; display: inline-block; text-align: right;">
+        <div style="font-size: 8px; text-transform: uppercase; color: #888; margin-bottom: 4px;">FACTURE</div>
+        <div style="font-size: 16px; font-weight: bold; color: #1a237e;">{{ facture.numero }}</div>
+        <div style="font-size: 9px; color: #555; margin-top: 4px;">
+            Date : {{ facture.dateFacture ? facture.dateFacture|date('d/m/Y') : 'N/A' }}
+        </div>
+    </div>
+{% endblock %}
+
+{% block content %}
+
+    {# ===== DESTINATAIRE ===== #}
+    <div class="clearfix">
+        {% set client = facture.client %}
+        {% if client %}
+        <div class="recipient-block">
+            <div class="recipient-label">Destinataire</div>
+            <div class="recipient-name">{{ client.raisonSocial }}</div>
+            <div class="recipient-info">
+                {% if client.adresse %}{{ client.adresse }}<br>{% endif %}
+                {% if client.codePostal or client.ville %}{{ client.codePostal }} {{ client.ville }}<br>{% endif %}
+                {% if client.telephone %}Tél : {{ client.telephone }}<br>{% endif %}
+                {% if client.email %}{{ client.email }}{% endif %}
+            </div>
+        </div>
+        {% endif %}
+    </div>
+
+    {# ===== TITRE ===== #}
+    <div class="document-title">
+        <h1>FACTURE</h1>
+        <div class="document-meta">
+            <span>{{ facture.description ?? '' }}</span>
+            <span style="text-align: right;">
+                {% if facture.chantier %}Chantier : {{ facture.chantier.code }} — {{ facture.chantier.nom }}{% endif %}
+            </span>
+        </div>
+    </div>
+
+    {# ===== INFOS CHANTIER ===== #}
+    {% if facture.chantier is not null %}
+    <div class="info-section">
+        <div class="info-section-title">Chantier</div>
+        <div style="font-size: 9px; line-height: 1.6;">
+            <strong>{{ facture.chantier.code }}</strong> — {{ facture.chantier.nom }}
+        </div>
+    </div>
+    {% endif %}
+
+    {# ===== LIGNES DE FACTURE ===== #}
+    <table class="details-table">
+        <thead>
+            <tr>
+                <th style="width: 45%;">Désignation</th>
+                <th style="width: 10%;" class="text-center">Qté</th>
+                <th style="width: 15%;" class="text-right">P.U. HT</th>
+                <th style="width: 10%;" class="text-center">TVA %</th>
+                <th style="width: 20%;" class="text-right">Montant HT</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% set totalHT = 0 %}
+            {% set totalTTC = 0 %}
+
+            {% for ligne in facture.lignes %}
+                {% set ligneHt = (ligne.quantite ?? 0) * (ligne.prixUnitaireHt ?? 0) %}
+                {% set ligneTva = ligne.tauxTva ?? 20 %}
+                {% set ligneTtc = ligneHt * (1 + ligneTva / 100) %}
+                {% set totalHT = totalHT + ligneHt %}
+                {% set totalTTC = totalTTC + ligneTtc %}
+                <tr>
+                    <td>{{ ligne.designation }}</td>
+                    <td class="text-center">{{ ligne.quantite }}</td>
+                    <td class="text-right">{{ ligne.prixUnitaireHt ? ligne.prixUnitaireHt|number_format(2, ',', ' ') ~ ' €' : '' }}</td>
+                    <td class="text-center">{{ ligneTva|number_format(2) }}%</td>
+                    <td class="text-right">{{ ligneHt > 0 ? ligneHt|number_format(2, ',', ' ') ~ ' €' : '' }}</td>
+                </tr>
+            {% else %}
+                <tr>
+                    <td colspan="5" style="text-align: center; padding: 20px; color: #aaa;">
+                        Aucune ligne dans cette facture
+                    </td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    {# ===== TOTAUX ===== #}
+    {% set totalTVA = totalTTC - totalHT %}
+    <div class="totals-section">
+        <div class="totals-spacer"></div>
+        <div class="totals-box">
+            <div class="total-row">
+                <span class="total-label">Total HT</span>
+                <span class="total-value">{{ totalHT|number_format(2, ',', ' ') }} €</span>
+            </div>
+            <div class="total-row">
+                <span class="total-label">TVA</span>
+                <span class="total-value">{{ totalTVA|number_format(2, ',', ' ') }} €</span>
+            </div>
+            <div class="total-row total-ttc">
+                <span class="total-label">TOTAL TTC</span>
+                <span class="total-value">{{ totalTTC|number_format(2, ',', ' ') }} €</span>
+            </div>
+        </div>
+    </div>
+
+{% endblock %}
+
+{% block conditions %}
+    <div class="conditions-section">
+        <div class="conditions-left">
+            <strong>Mode de règlement :</strong> {{ entreprise.modeReglement ?? 'Selon conditions générales' }}<br>
+            {% if facture.dateReglement %}
+                <strong>Date de règlement :</strong> {{ facture.dateReglement|date('d/m/Y') }}
+            {% endif %}
+        </div>
+    </div>
+{% endblock %}

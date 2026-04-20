@@ -1,0 +1,234 @@
+{% extends 'pdf/_base.html.twig' %}
+
+{% block title %}Situation {{ situation.numeroFacture }}{% endblock %}
+
+{% block content %}
+
+    {% set chantier = situation.chantier %}
+    {% set client   = chantier ? chantier.client : null %}
+
+    {# ===== TITRE + CLIENT ===== #}
+    <div class="doc-title-row">
+        <div class="doc-title-cell">
+            <div class="doc-title-main">Situation n° {{ situation.numeroFacture ?: situation.id }}</div>
+            <div class="doc-title-sub">
+                N° situation : <strong>{{ situation.numSituation ?: '—' }}</strong><br>
+                Date : {{ situation.dateSituation ? situation.dateSituation|date('d/m/Y') : 'N/A' }}<br>
+                {% if chantier %}
+                    Chantier : {{ chantier.nom }}{% if chantier.villeChantier %} — {{ chantier.villeChantier }}{% endif %}<br>
+                {% endif %}
+                {% if situation.titre %}{{ situation.titre }}{% endif %}
+            </div>
+        </div>
+        {% if client %}
+        <div class="doc-client-cell">
+            <div class="client-name">{{ client.raisonSocial|upper }}</div>
+            <div class="client-addr">
+                {% if client.adresse %}{{ client.adresse }}<br>{% endif %}
+                {% if client.codePostal or client.ville %}{{ client.codePostal }} {{ client.ville }}<br>{% endif %}
+                {% if client.telephone %}{{ client.telephone }}<br>{% endif %}
+                {% if client.email %}{{ client.email }}{% endif %}
+            </div>
+        </div>
+        {% endif %}
+    </div>
+
+    {# ===== DÉTAIL DES LIGNES ===== #}
+    {% if details|length > 0 %}
+    <table class="details-table">
+        <thead>
+            <tr>
+                <th style="width: 40%;">Désignation</th>
+                <th style="width: 15%;" class="text-center">Groupe</th>
+                <th style="width: 15%;" class="text-right">Cumul antérieur</th>
+                <th style="width: 15%;" class="text-right">Montant mois</th>
+                <th style="width: 15%;" class="text-right">Cumul</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for detail in details %}
+                <tr>
+                    <td class="cell-desc">{{ detail.designation }}</td>
+                    <td class="text-center" style="font-size:10px;color:#888;">{{ detail.groupe ?: '' }}</td>
+                    <td class="text-right cell-num">{{ detail.cumuleAnterieur ? detail.cumuleAnterieur|number_format(2, ',', ' ') ~ ' €' : '—' }}</td>
+                    <td class="text-right cell-num">{{ detail.montant ? detail.montant|number_format(2, ',', ' ') ~ ' €' : '—' }}</td>
+                    <td class="text-right cell-num">{{ detail.cumule ? detail.cumule|number_format(2, ',', ' ') ~ ' €' : '—' }}</td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% endif %}
+
+    {# ===== FACTURATION TRAVAUX ===== #}
+    {% if facturationTravaux|length > 0 %}
+    <h3 style="font-size:11px;text-transform:uppercase;letter-spacing:1.2px;color:#1B7A8A;margin:18px 0 8px;">Facturation des travaux</h3>
+    <table class="details-table">
+        <thead>
+            <tr>
+                <th style="width: 55%;">Désignation</th>
+                <th style="width: 15%;" class="text-right">Cumul antérieur</th>
+                <th style="width: 15%;" class="text-right">Mois</th>
+                <th style="width: 15%;" class="text-right">Cumul</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for ft in facturationTravaux %}
+                <tr>
+                    <td class="cell-desc">{{ ft.designation }}{% if ft.divers %} <span style="color:#999;font-size:10px;">({{ ft.divers }})</span>{% endif %}</td>
+                    <td class="text-right cell-num">{{ ft.cumuleAnterieur|default(0)|number_format(2, ',', ' ') }} €</td>
+                    <td class="text-right cell-num">{{ ft.montant|default(0)|number_format(2, ',', ' ') }} €</td>
+                    <td class="text-right cell-num">{{ ft.cumule|default(0)|number_format(2, ',', ' ') }} €</td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% endif %}
+
+    {# ===== RETENUES ===== #}
+    {% if retenues|length > 0 %}
+    <h3 style="font-size:11px;text-transform:uppercase;letter-spacing:1.2px;color:#1B7A8A;margin:18px 0 8px;">Retenues</h3>
+    <table class="details-table">
+        <thead>
+            <tr>
+                <th style="width: 55%;">Désignation</th>
+                <th style="width: 15%;" class="text-right">Cumul antérieur</th>
+                <th style="width: 15%;" class="text-right">Mois</th>
+                <th style="width: 15%;" class="text-right">Cumul</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for r in retenues %}
+                <tr>
+                    <td class="cell-desc">{{ r.designation }}{% if r.divers %} <span style="color:#999;font-size:10px;">({{ r.divers }})</span>{% endif %}</td>
+                    <td class="text-right cell-num">{{ r.cumuleAnterieur|default(0)|number_format(2, ',', ' ') }} €</td>
+                    <td class="text-right cell-num">{{ r.montant|default(0)|number_format(2, ',', ' ') }} €</td>
+                    <td class="text-right cell-num">{{ r.cumule|default(0)|number_format(2, ',', ' ') }} €</td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% endif %}
+
+    {# ===== SOUS-TRAITANTS ===== #}
+    {% if sousTraitants|length > 0 %}
+    <h3 style="font-size:11px;text-transform:uppercase;letter-spacing:1.2px;color:#1B7A8A;margin:18px 0 8px;">Sous-traitants</h3>
+    <table class="details-table">
+        <thead>
+            <tr>
+                <th style="width: 40%;">Sous-traitant</th>
+                <th style="width: 20%;">Référence</th>
+                <th style="width: 20%;" class="text-right">Montant HT</th>
+                <th style="width: 20%;" class="text-right">TVA</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for st in sousTraitants %}
+                <tr>
+                    <td class="cell-desc">{{ st.sousTraitant ? st.sousTraitant.nom|default(st.sousTraitant) : '—' }}</td>
+                    <td class="cell-desc" style="font-size:11px;color:#555;">{{ st.reference ?: '—' }}</td>
+                    <td class="text-right cell-num">{{ st.montantHt ? st.montantHt|number_format(2, ',', ' ') ~ ' €' : '—' }}</td>
+                    <td class="text-right cell-num">{{ st.tva ? st.tva|number_format(2, ',', ' ') ~ ' €' : '—' }}</td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% endif %}
+
+    {# ===== PAIEMENTS ===== #}
+    {% if paiements|length > 0 %}
+    <h3 style="font-size:11px;text-transform:uppercase;letter-spacing:1.2px;color:#1B7A8A;margin:18px 0 8px;">Paiements</h3>
+    <table class="details-table">
+        <thead>
+            <tr>
+                <th style="width: 25%;">Date</th>
+                <th style="width: 30%;">Statut</th>
+                <th style="width: 25%;" class="text-right">Montant</th>
+                <th style="width: 20%;">Commentaire</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for p in paiements %}
+                <tr>
+                    <td class="cell-desc">{{ p.date ? p.date|date('d/m/Y') : '—' }}</td>
+                    <td class="cell-desc">{{ p.status ?: '—' }}</td>
+                    <td class="text-right cell-num">{{ p.montant ? p.montant|number_format(2, ',', ' ') ~ ' €' : '—' }}</td>
+                    <td class="cell-desc" style="font-size:11px;color:#555;">{{ p.commentaire ?: '' }}</td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% endif %}
+
+    {# ===== TROP PERÇUS ===== #}
+    {% if tropPercus|length > 0 %}
+    <h3 style="font-size:11px;text-transform:uppercase;letter-spacing:1.2px;color:#1B7A8A;margin:18px 0 8px;">Trop-perçus</h3>
+    <table class="details-table">
+        <thead>
+            <tr>
+                <th style="width: 25%;">Date</th>
+                <th style="width: 20%;">Statut</th>
+                <th style="width: 20%;" class="text-right">Montant</th>
+                <th style="width: 20%;" class="text-right">Utilisé</th>
+                <th style="width: 15%;">Comm.</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for tp in tropPercus %}
+                <tr>
+                    <td class="cell-desc">{{ tp.dateCreation ? tp.dateCreation|date('d/m/Y') : '—' }}</td>
+                    <td class="cell-desc">{{ tp.status ?: '—' }}</td>
+                    <td class="text-right cell-num">{{ tp.montant ? tp.montant|number_format(2, ',', ' ') ~ ' €' : '—' }}</td>
+                    <td class="text-right cell-num">{{ tp.montantUtilise ? tp.montantUtilise|number_format(2, ',', ' ') ~ ' €' : '—' }}</td>
+                    <td class="cell-desc" style="font-size:11px;color:#555;">{{ tp.commentaire ?: '' }}</td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% endif %}
+
+    {# ===== TOTAUX DÉTAILLÉS ===== #}
+    {% if totaux|length > 0 %}
+    <h3 style="font-size:11px;text-transform:uppercase;letter-spacing:1.2px;color:#1B7A8A;margin:18px 0 8px;">Récapitulatif</h3>
+    <table class="details-table">
+        <thead>
+            <tr>
+                <th style="width: 55%;">Désignation</th>
+                <th style="width: 15%;" class="text-right">Cumul antérieur</th>
+                <th style="width: 15%;" class="text-right">Mois</th>
+                <th style="width: 15%;" class="text-right">Cumul</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for t in totaux %}
+                <tr>
+                    <td class="cell-desc">{{ t.designation }}{% if t.divers %} <span style="color:#999;font-size:10px;">({{ t.divers }})</span>{% endif %}</td>
+                    <td class="text-right cell-num">{{ t.cumuleAnterieur|default(0)|number_format(2, ',', ' ') }} €</td>
+                    <td class="text-right cell-num">{{ t.montant|default(0)|number_format(2, ',', ' ') }} €</td>
+                    <td class="text-right cell-num">{{ t.cumule|default(0)|number_format(2, ',', ' ') }} €</td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% endif %}
+
+    {# ===== TOTAL TTC ===== #}
+    <div class="totals-wrap">
+        <div class="totals-spacer"></div>
+        <div class="totals-box">
+            <div class="total-row total-ttc">
+                <span class="total-label">Montant total TTC</span>
+                <span class="total-value">{{ situation.montantTotalTTC ? situation.montantTotalTTC|number_format(2, ',', ' ') : '0,00' }} €</span>
+            </div>
+        </div>
+    </div>
+
+    {# ===== MENTIONS ===== #}
+    <div class="payment-terms" style="margin-top: 30px;">
+        <p><strong style="color:#222;">Mode de règlement :</strong>
+            {{ entreprise.modeReglement ?: 'Virement bancaire' }}
+            {% if entreprise.iban %} — IBAN : {{ entreprise.iban }}{% endif %}
+            {% if entreprise.bic %} — BIC : {{ entreprise.bic }}{% endif %}
+        </p>
+    </div>
+
+{% endblock %}

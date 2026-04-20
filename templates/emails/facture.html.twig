@@ -1,0 +1,25 @@
+{% extends 'emails/_base.html.twig' %}
+
+{% block title %}Votre facture {{ facture.numero }}{% endblock %}
+
+{% block content %}
+    <p>Bonjour,</p>
+
+    <p>
+        Veuillez trouver ci-joint la facture&nbsp;<strong>{{ facture.numero }}</strong>
+        {% if facture.description %} — {{ facture.description }}{% endif %}.
+    </p>
+
+    {% if messageIntro %}
+        <p>{{ messageIntro|nl2br }}</p>
+    {% endif %}
+
+    <p>
+        Pour toute question, vous pouvez répondre directement à cet email.
+    </p>
+
+    <p>
+        Cordialement,<br>
+        {{ entreprise.nom|default('HK Entreprise') }}
+    </p>
+{% endblock %}

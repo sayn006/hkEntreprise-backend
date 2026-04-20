@@ -1,0 +1,94 @@
+{% extends 'pdf/_base.html.twig' %}
+
+{% block title %}Bon de commande {{ bon.numCommande }}{% endblock %}
+
+{% block content %}
+
+    {% set fournisseur = bon.fournisseur %}
+    {% set chantier    = bon.chantier %}
+
+    {# ===== TITRE + FOURNISSEUR ===== #}
+    <div class="doc-title-row">
+        <div class="doc-title-cell">
+            <div class="doc-title-main">Bon de commande n° {{ bon.numCommande }}</div>
+            <div class="doc-title-sub">
+                Date d'émission : {{ bon.createdAt ? bon.createdAt|date('d/m/Y') : '—' }}<br>
+                {% if bon.dateLivraison %}Livraison prévue : <strong>{{ bon.dateLivraison|date('d/m/Y') }}</strong><br>{% endif %}
+                {% if chantier %}Chantier : {{ chantier.nom }}{% if chantier.villeChantier %} — {{ chantier.villeChantier }}{% endif %}{% endif %}
+            </div>
+        </div>
+        {% if fournisseur %}
+        <div class="doc-client-cell">
+            <div style="font-size:10px;text-transform:uppercase;color:#888;letter-spacing:1.2px;margin-bottom:4px;">Fournisseur</div>
+            <div class="client-name">{{ fournisseur.nom|upper }}</div>
+            <div class="client-addr">
+                {% if fournisseur.adresse %}{{ fournisseur.adresse }}<br>{% endif %}
+                {% if fournisseur.codePostal or fournisseur.ville %}{{ fournisseur.codePostal }} {{ fournisseur.ville }}<br>{% endif %}
+                {% if fournisseur.telephone %}{{ fournisseur.telephone }}<br>{% endif %}
+                {% if fournisseur.email %}{{ fournisseur.email }}{% endif %}
+            </div>
+        </div>
+        {% endif %}
+    </div>
+
+    {# ===== LIGNES ARTICLES ===== #}
+    <table class="details-table">
+        <thead>
+            <tr>
+                <th style="width: 15%;">Référence</th>
+                <th style="width: 45%;">Désignation</th>
+                <th style="width: 10%;" class="text-right">Qté</th>
+                <th style="width: 15%;" class="text-right">P.U. HT</th>
+                <th style="width: 15%;" class="text-right">Total HT</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% set totalHT = 0 %}
+            {% for article in articles %}
+                {% set lineTotal = (article.qte|default(0)) * (article.prixUnitaireHt|default(0)) %}
+                {% set totalHT = totalHT + lineTotal %}
+                <tr>
+                    <td class="cell-desc" style="font-size:11px;color:#555;font-family:monospace;">{{ article.reference ?: '—' }}</td>
+                    <td class="cell-desc">{{ article.designation }}</td>
+                    <td class="text-right cell-num">{{ article.qte }}</td>
+                    <td class="text-right cell-num">{{ article.prixUnitaireHt ? article.prixUnitaireHt|number_format(2, ',', ' ') ~ ' €' : '—' }}</td>
+                    <td class="text-right cell-num">{{ lineTotal > 0 ? lineTotal|number_format(2, ',', ' ') ~ ' €' : '—' }}</td>
+                </tr>
+            {% else %}
+                <tr>
+                    <td colspan="5" style="text-align: center; padding: 20px; color: #aaa;">
+                        Aucun article sur ce bon de commande
+                    </td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    {# ===== TOTAL ===== #}
+    <div class="totals-wrap">
+        <div class="totals-spacer"></div>
+        <div class="totals-box">
+            {% set affiche = bon.montantTotal is not empty ? bon.montantTotal : totalHT %}
+            <div class="total-row total-ttc">
+                <span class="total-label">Montant total HT</span>
+                <span class="total-value">{{ affiche|number_format(2, ',', ' ') }} €</span>
+            </div>
+        </div>
+    </div>
+
+    {# ===== COMMENTAIRE / CONDITIONS ===== #}
+    {% if bon.commentaire %}
+    <div style="margin-top:30px;">
+        <h3 style="font-size:11px;text-transform:uppercase;letter-spacing:1.2px;color:#1B7A8A;margin-bottom:6px;">Commentaire</h3>
+        <p style="font-size:12px;color:#555;line-height:1.6;">{{ bon.commentaire|nl2br }}</p>
+    </div>
+    {% endif %}
+
+    <div class="payment-terms">
+        <p>Merci de confirmer la bonne réception de ce bon de commande par retour d'email.</p>
+        {% if bon.dateLivraison %}
+            <p><strong style="color:#222;">Livraison souhaitée :</strong> {{ bon.dateLivraison|date('d/m/Y') }}</p>
+        {% endif %}
+    </div>
+
+{% endblock %}

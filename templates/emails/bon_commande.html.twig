@@ -1,0 +1,25 @@
+{% extends 'emails/_base.html.twig' %}
+
+{% block title %}Bon de commande {{ bon.numCommande }}{% endblock %}
+
+{% block content %}
+    <p>Bonjour{% if bon.fournisseur and bon.fournisseur.nom %} {{ bon.fournisseur.nom }}{% endif %},</p>
+
+    <p>
+        Veuillez trouver ci-joint notre bon de commande&nbsp;<strong>{{ bon.numCommande }}</strong>.
+        {% if bon.dateLivraison %}<br>Livraison souhaitée pour le <strong>{{ bon.dateLivraison|date('d/m/Y') }}</strong>.{% endif %}
+    </p>
+
+    {% if messageIntro %}
+        <p>{{ messageIntro|nl2br }}</p>
+    {% endif %}
+
+    <p>
+        Merci de confirmer la bonne réception par retour d'email.
+    </p>
+
+    <p>
+        Cordialement,<br>
+        {{ entreprise.nom|default('HK Entreprise') }}
+    </p>
+{% endblock %}

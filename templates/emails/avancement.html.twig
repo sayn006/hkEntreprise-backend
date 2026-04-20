@@ -1,0 +1,25 @@
+{% extends 'emails/_base.html.twig' %}
+
+{% block title %}Votre avancement {{ avancement.numero }}{% endblock %}
+
+{% block content %}
+    <p>Bonjour,</p>
+
+    <p>
+        Veuillez trouver ci-joint l'avancement&nbsp;<strong>{{ avancement.numero }}</strong>
+        {% if avancement.devis and avancement.devis.titre %} — {{ avancement.devis.titre }}{% endif %}.
+    </p>
+
+    {% if messageIntro %}
+        <p>{{ messageIntro|nl2br }}</p>
+    {% endif %}
+
+    <p>
+        Pour toute question, vous pouvez répondre directement à cet email.
+    </p>
+
+    <p>
+        Cordialement,<br>
+        {{ entreprise.nom|default('HK Entreprise') }}
+    </p>
+{% endblock %}

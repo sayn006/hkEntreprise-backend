@@ -1,0 +1,116 @@
+{% extends 'pdf/_base.html.twig' %}
+
+{% block title %}Avancement {{ avancement.numero }}{% endblock %}
+
+{% block content %}
+
+    {% set devis    = avancement.devis %}
+    {% set chantier = devis ? devis.chantier : null %}
+    {% set client   = chantier ? chantier.client : null %}
+
+    {# ===== TITRE + CLIENT ===== #}
+    <div class="doc-title-row">
+        <div class="doc-title-cell">
+            <div class="doc-title-main">Avancement n° {{ avancement.numero }}</div>
+            <div class="doc-title-sub">
+                Mois de référence : <strong>{{ avancement.moisReference ? avancement.moisReference|date('m/Y') : '—' }}</strong><br>
+                Date d'édition : {{ avancement.dateCreation ? avancement.dateCreation|date('d/m/Y') : '—' }}<br>
+                {% if devis %}Devis lié : <strong>{{ devis.numero }}</strong>{% if devis.titre %} — {{ devis.titre }}{% endif %}<br>{% endif %}
+                {% if chantier %}Chantier : {{ chantier.nom }}{% if chantier.villeChantier %} — {{ chantier.villeChantier }}{% endif %}{% endif %}
+            </div>
+        </div>
+        {% if client %}
+        <div class="doc-client-cell">
+            <div class="client-name">{{ client.raisonSocial|upper }}</div>
+            <div class="client-addr">
+                {% if client.adresse %}{{ client.adresse }}<br>{% endif %}
+                {% if client.codePostal or client.ville %}{{ client.codePostal }} {{ client.ville }}<br>{% endif %}
+                {% if client.telephone %}{{ client.telephone }}<br>{% endif %}
+                {% if client.email %}{{ client.email }}{% endif %}
+            </div>
+        </div>
+        {% endif %}
+    </div>
+
+    {# ===== SYNTHÈSE ===== #}
+    <div style="display:table;width:100%;margin-bottom:20px;">
+        <div style="display:table-cell;width:33%;padding:10px;background:#f8fafc;border:1px solid #e4e4e4;">
+            <div style="font-size:10px;color:#777;text-transform:uppercase;letter-spacing:1px;">Total HT du mois</div>
+            <div style="font-size:16px;font-weight:700;color:#1B7A8A;">{{ avancement.totalHT|number_format(2, ',', ' ') }} €</div>
+        </div>
+        <div style="display:table-cell;width:33%;padding:10px;background:#f8fafc;border:1px solid #e4e4e4;border-left:none;">
+            <div style="font-size:10px;color:#777;text-transform:uppercase;letter-spacing:1px;">Total cumulé HT</div>
+            <div style="font-size:16px;font-weight:700;color:#111;">{{ avancement.totalCumule|number_format(2, ',', ' ') }} €</div>
+        </div>
+        <div style="display:table-cell;width:34%;padding:10px;background:#f8fafc;border:1px solid #e4e4e4;border-left:none;">
+            <div style="font-size:10px;color:#777;text-transform:uppercase;letter-spacing:1px;">Avancement global</div>
+            <div style="font-size:16px;font-weight:700;color:#111;">{{ avancement.pourcentageGlobal|number_format(2, ',', ' ') }} %</div>
+        </div>
+    </div>
+
+    {# ===== LIGNES D'AVANCEMENT ===== #}
+    <table class="details-table">
+        <thead>
+            <tr>
+                <th style="width: 10%;">Réf.</th>
+                <th style="width: 28%;">Désignation</th>
+                <th style="width: 6%;" class="text-center">Unité</th>
+                <th style="width: 6%;" class="text-right">Qté</th>
+                <th style="width: 10%;" class="text-right">P.U.</th>
+                <th style="width: 10%;" class="text-right">Total devis</th>
+                <th style="width: 6%;" class="text-right">% M-1</th>
+                <th style="width: 8%;" class="text-right">Cumul M-1</th>
+                <th style="width: 6%;" class="text-right">% Mois</th>
+                <th style="width: 10%;" class="text-right">Total HT</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for d in details %}
+                {% if d.lineType == 'BH' or d.isBlockHeader %}
+                    <tr class="bloc-row">
+                        <td colspan="10">{{ d.designation }}</td>
+                    </tr>
+                {% else %}
+                    <tr>
+                        <td class="cell-desc" style="font-size:10.5px;color:#666;">{{ d.reference ?: '—' }}</td>
+                        <td class="cell-desc">{{ d.designation }}</td>
+                        <td class="text-center">{{ d.unite ?: '' }}</td>
+                        <td class="text-right cell-num">{{ d.quantite ?: '' }}</td>
+                        <td class="text-right cell-num">{{ d.prixUnitaire ? d.prixUnitaire|number_format(2, ',', ' ') : '' }}</td>
+                        <td class="text-right cell-num">{{ d.totalDevis ? d.totalDevis|number_format(2, ',', ' ') : '' }}</td>
+                        <td class="text-right cell-num">{{ d.pourcentageMoins1|number_format(2, ',', ' ') }}%</td>
+                        <td class="text-right cell-num">{{ d.totalHTMoins1|number_format(2, ',', ' ') }}</td>
+                        <td class="text-right cell-num">{{ d.pourcentage|number_format(2, ',', ' ') }}%</td>
+                        <td class="text-right cell-num" style="font-weight:600;">{{ d.totalHT|number_format(2, ',', ' ') }}</td>
+                    </tr>
+                {% endif %}
+            {% else %}
+                <tr>
+                    <td colspan="10" style="text-align: center; padding: 20px; color: #aaa;">
+                        Aucune ligne sur cet avancement
+                    </td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    {# ===== TOTAUX ===== #}
+    <div class="totals-wrap">
+        <div class="totals-spacer"></div>
+        <div class="totals-box">
+            <div class="total-row">
+                <span class="total-label">Total HT du mois</span>
+                <span class="total-value">{{ avancement.totalHT|number_format(2, ',', ' ') }} €</span>
+            </div>
+            <div class="total-row">
+                <span class="total-label">Total cumulé HT</span>
+                <span class="total-value">{{ avancement.totalCumule|number_format(2, ',', ' ') }} €</span>
+            </div>
+            <div class="total-row total-ttc">
+                <span class="total-label">Avancement global</span>
+                <span class="total-value">{{ avancement.pourcentageGlobal|number_format(2, ',', ' ') }} %</span>
+            </div>
+        </div>
+    </div>
+
+{% endblock %}

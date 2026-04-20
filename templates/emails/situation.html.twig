@@ -1,0 +1,25 @@
+{% extends 'emails/_base.html.twig' %}
+
+{% block title %}Votre situation {{ situation.numeroFacture ?: situation.id }}{% endblock %}
+
+{% block content %}
+    <p>Bonjour,</p>
+
+    <p>
+        Veuillez trouver ci-joint la situation&nbsp;<strong>{{ situation.numeroFacture ?: situation.id }}</strong>
+        {% if situation.titre %} — {{ situation.titre }}{% endif %}.
+    </p>
+
+    {% if messageIntro %}
+        <p>{{ messageIntro|nl2br }}</p>
+    {% endif %}
+
+    <p>
+        Pour toute question, vous pouvez répondre directement à cet email.
+    </p>
+
+    <p>
+        Cordialement,<br>
+        {{ entreprise.nom|default('HK Entreprise') }}
+    </p>
+{% endblock %}

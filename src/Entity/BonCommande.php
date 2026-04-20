@@ -19,7 +19,7 @@ use Symfony\Component\Serializer\Attribute\Groups;
     operations: [
         new GetCollection(),
         new Get(),
-        new Post(),
+        new Post(processor: \App\State\BonCommandeProcessor::class),
         new Patch(),
         new Delete(),
     ],
@@ -37,19 +37,24 @@ class BonCommande
 
     #[ORM\ManyToOne(inversedBy: 'bonCommandes')]
     #[ORM\JoinColumn(nullable: false)]
+    #[Groups(['bon_commande:read', 'bon_commande:write'])]
     private ?Chantier $chantier = null;
 
     #[ORM\Column]
+    #[Groups(['bon_commande:read'])]
     private ?\DateTimeImmutable $createdAt = null;
 
     #[ORM\Column(nullable: true)]
+    #[Groups(['bon_commande:read'])]
     private ?\DateTimeImmutable $validateAt = null;
 
     #[ORM\ManyToOne]
     #[ORM\JoinColumn(nullable: false)]
+    #[Groups(['bon_commande:read'])]
     private ?User $createUser = null;
 
     #[ORM\ManyToOne]
+    #[Groups(['bon_commande:read'])]
     private ?User $validateUser = null;
 
     #[ORM\Column(length: 100)]
@@ -64,15 +69,19 @@ class BonCommande
 
     #[ORM\ManyToOne(inversedBy: 'bonCommandes')]
     #[ORM\JoinColumn(nullable: false)]
+    #[Groups(['bon_commande:read', 'bon_commande:write'])]
     private ?Fournisseur $fournisseur = null;
 
     #[ORM\Column(nullable: true)]
+    #[Groups(['bon_commande:read', 'bon_commande:write'])]
     private ?int $isFinished = null;
 
     #[ORM\Column(nullable: true)]
+    #[Groups(['bon_commande:read', 'bon_commande:write'])]
     private ?int $isValidated = null;
 
     #[ORM\Column(length: 255, nullable: true)]
+    #[Groups(['bon_commande:read'])]
     private ?string $fichier = null;
 
     #[ORM\Column(nullable: true)]
@@ -80,24 +89,31 @@ class BonCommande
     private ?float $montantTotal = null;
 
     #[ORM\Column(type: Types::DATE_MUTABLE, nullable: true)]
+    #[Groups(['bon_commande:read', 'bon_commande:write'])]
     private ?\DateTimeInterface $dateLivraison = null;
 
     #[ORM\Column(nullable: true)]
+    #[Groups(['bon_commande:read', 'bon_commande:write'])]
     private ?int $isSent = null;
 
     #[ORM\ManyToOne(inversedBy: 'bonCommandes')]
+    #[Groups(['bon_commande:read', 'bon_commande:write'])]
     private ?FournisseurContact $fournisseurContact = null;
 
     #[ORM\Column(nullable: true)]
+    #[Groups(['bon_commande:read', 'bon_commande:write'])]
     private ?int $isDelivered = null;
 
     #[ORM\Column(type: Types::DATE_MUTABLE, nullable: true)]
+    #[Groups(['bon_commande:read', 'bon_commande:write'])]
     private ?\DateTimeInterface $deliveredAt = null;
 
     #[ORM\Column(type: Types::TEXT, nullable: true)]
+    #[Groups(['bon_commande:read', 'bon_commande:write'])]
     private ?string $commentaire = null;
 
     #[ORM\Column(type: Types::TEXT, nullable: true)]
+    #[Groups(['bon_commande:read'])]
     private ?string $historique = null;
 
     #[ORM\ManyToOne]

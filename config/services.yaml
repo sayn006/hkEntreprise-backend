@@ -29,3 +29,7 @@ services:
     App\State\AvancementCreationProcessor:
         bind:
             $innerProcessor: '@api_platform.doctrine.orm.state.persist_processor'
+
+    App\State\BonCommandeProcessor:
+        bind:
+            $innerProcessor: '@api_platform.doctrine.orm.state.persist_processor'

@@ -87,12 +87,24 @@ class SituationMailController extends AbstractController
         $this->mailer->send($email);
 
         $situation->setEnvoyeAt(new \DateTime());
+
+        // Bascule l'avancement lié de "Validé" à "Facturé"
+        $avancement = $situation->getDevisAvancement();
+        $avancementPasseEnFacture = false;
+        if ($avancement !== null && $avancement->getEtat() === 'EtatAvancementValide') {
+            $avancement->setEtat('EtatAvancementFacture');
+            $avancementPasseEnFacture = true;
+        }
+
         $this->em->flush();
 
         return $this->json([
-            'message'  => 'Situation envoyée avec succès.',
-            'to'       => $to,
-            'envoyeAt' => $situation->getEnvoyeAt()?->format(\DateTimeInterface::ATOM),
+            'message'                => 'Situation envoyée avec succès.',
+            'to'                     => $to,
+            'envoyeAt'               => $situation->getEnvoyeAt()?->format(\DateTimeInterface::ATOM),
+            'avancementId'           => $avancement?->getId(),
+            'avancementEtat'         => $avancement?->getEtat(),
+            'avancementPasseEnFacture' => $avancementPasseEnFacture,
         ]);
     }
 }

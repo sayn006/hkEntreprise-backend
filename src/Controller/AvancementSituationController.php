@@ -4,6 +4,7 @@ namespace App\Controller;
 
 use App\Entity\DevisAvancement;
 use App\Entity\FactureSituation;
+use App\Service\SituationBuilderService;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -22,6 +23,7 @@ class AvancementSituationController extends AbstractController
 {
     public function __construct(
         private EntityManagerInterface $em,
+        private SituationBuilderService $situationBuilder,
     ) {
     }
 
@@ -83,6 +85,9 @@ class AvancementSituationController extends AbstractController
         $avancement->setFactureSituation($situation);
 
         $this->em->flush();
+
+        // Auto-remplissage (détails, travaux, retenue, totaux)
+        $this->situationBuilder->buildFromAvancement($avancement);
 
         return $this->json([
             'message'          => 'Situation créée en brouillon.',

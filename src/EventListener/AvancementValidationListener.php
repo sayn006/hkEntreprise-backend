@@ -4,6 +4,7 @@ namespace App\EventListener;
 
 use App\Entity\DevisAvancement;
 use App\Entity\FactureSituation;
+use App\Service\SituationBuilderService;
 use Doctrine\Bundle\DoctrineBundle\Attribute\AsDoctrineListener;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Event\PostUpdateEventArgs;
@@ -11,12 +12,17 @@ use Doctrine\ORM\Events;
 
 /**
  * Quand un DevisAvancement passe au statut "EtatAvancementValide",
- * génère automatiquement la FactureSituation liée en brouillon,
- * si elle n'existe pas déjà.
+ * génère automatiquement la FactureSituation liée en brouillon
+ * et la remplit automatiquement (détails / travaux / retenue / totaux)
+ * via SituationBuilderService.
  */
 #[AsDoctrineListener(event: Events::postUpdate)]
 class AvancementValidationListener
 {
+    public function __construct(
+        private SituationBuilderService $situationBuilder,
+    ) {}
+
     public function postUpdate(PostUpdateEventArgs $args): void
     {
         $entity = $args->getObject();
@@ -37,12 +43,13 @@ class AvancementValidationListener
             return;
         }
 
-        // Déjà lié à une situation ? rien à faire.
-        if ($entity->getFactureSituation() !== null) {
-            return;
+        // Crée la situation si elle n'existe pas déjà
+        if ($entity->getFactureSituation() === null) {
+            $this->createSituation($entity, $em);
         }
 
-        $this->createSituation($entity, $em);
+        // Auto-remplissage (idempotent côté service)
+        $this->situationBuilder->buildFromAvancement($entity);
     }
 
     private function createSituation(DevisAvancement $avancement, EntityManagerInterface $em): void

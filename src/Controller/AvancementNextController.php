@@ -95,6 +95,13 @@ class AvancementNextController extends AbstractController
         $sourceDetails = $this->avancementDetailRepo->findBy(['devisAvancement' => $source]);
 
         foreach ($sourceDetails as $srcDetail) {
+            // Les lignes travaux supplémentaires sont ponctuelles : on ne les reporte PAS
+            // sur l'avancement suivant. Elles restent acquises uniquement sur l'avancement
+            // où elles ont été saisies.
+            if ($srcDetail->isTravauxSupplementaires()) {
+                continue;
+            }
+
             $devisDetail = $srcDetail->getDevisDetail();
             // Certaines lignes (header, etc.) peuvent ne pas avoir de devisDetail, on les duplique quand même
             $nd = new DevisAvancementDetail();

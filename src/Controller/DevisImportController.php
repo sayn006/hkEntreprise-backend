@@ -283,13 +283,16 @@ class DevisImportController extends AbstractController
     private function suggestField(string $colName): string
     {
         $s = $this->normalize($colName);
+        // Ordre : du plus spécifique au plus générique. Les clés dont un
+        // mot-clé est sous-chaîne d'un autre (ex: "unit" ⊂ "unitaire")
+        // doivent passer après le plus long.
         $map = [
-            'reference'    => ['reference', 'ref', 'code'],
-            'designation'  => ['designation', 'description', 'libelle', 'intitule', 'nom'],
-            'quantite'     => ['quantite', 'qte', 'qty', 'quantity'],
-            'unite'        => ['unite', 'unit', 'u'],
-            'prixUnitaire' => ['prixunitaire', 'pu', 'prixunitaireht', 'puht', 'prix', 'price'],
+            'prixUnitaire' => ['prixunitaireht', 'prixunitaire', 'puht', 'pu', 'prix', 'price'],
             'tva'          => ['tva', 'vat', 'tax'],
+            'quantite'     => ['quantite', 'qte', 'qty', 'quantity'],
+            'designation'  => ['designation', 'description', 'libelle', 'intitule', 'nom'],
+            'reference'    => ['reference', 'ref', 'code'],
+            'unite'        => ['unite', 'unit'],
             'type'         => ['type', 'categorie', 'kind'],
         ];
         foreach ($map as $field => $keywords) {

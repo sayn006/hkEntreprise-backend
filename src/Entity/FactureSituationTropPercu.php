@@ -2,13 +2,34 @@
 
 namespace App\Entity;
 
+use ApiPlatform\Doctrine\Orm\Filter\SearchFilter;
+use ApiPlatform\Metadata\ApiFilter;
+use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Metadata\Delete;
+use ApiPlatform\Metadata\Get;
+use ApiPlatform\Metadata\GetCollection;
+use ApiPlatform\Metadata\Patch;
+use ApiPlatform\Metadata\Post;
 use App\Repository\FactureSituationTropPercuRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Serializer\Attribute\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
 
+#[ApiResource(
+    operations: [
+        new GetCollection(security: "is_granted('ROLE_USER')"),
+        new Get(security: "is_granted('ROLE_USER')"),
+        new Post(security: "is_granted('ROLE_USER')"),
+        new Patch(security: "is_granted('ROLE_USER')"),
+        new Delete(security: "is_granted('ROLE_USER')"),
+    ],
+    normalizationContext: ['groups' => ['fs_trop_percu:read']],
+    denormalizationContext: ['groups' => ['fs_trop_percu:write']],
+)]
+#[ApiFilter(SearchFilter::class, properties: ['factureSituation' => 'exact', 'status' => 'exact'])]
 #[ORM\Entity(repositoryClass: FactureSituationTropPercuRepository::class)]
 #[ORM\Table(name: 'facture_situation_trop_percu')]
 class FactureSituationTropPercu
@@ -16,31 +37,39 @@ class FactureSituationTropPercu
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
+    #[Groups(['fs_trop_percu:read'])]
     private ?int $id = null;
 
     #[ORM\ManyToOne(targetEntity: FactureSituation::class, inversedBy: 'tropPercus')]
     #[ORM\JoinColumn(nullable: false, onDelete: 'CASCADE')]
+    #[Groups(['fs_trop_percu:read', 'fs_trop_percu:write'])]
     private ?FactureSituation $factureSituation = null;
 
     #[ORM\Column(type: Types::DECIMAL, precision: 10, scale: 2)]
     #[Assert\NotBlank(message: 'Le montant est obligatoire')]
     #[Assert\Positive(message: 'Le montant doit être positif')]
+    #[Groups(['fs_trop_percu:read', 'fs_trop_percu:write'])]
     private ?string $montant = null;
 
     #[ORM\Column(type: Types::DECIMAL, precision: 10, scale: 2, options: ['default' => '0.00'])]
+    #[Groups(['fs_trop_percu:read'])]
     private ?string $montantUtilise = '0.00';
 
     #[ORM\Column(length: 50, options: ['default' => 'disponible'])]
+    #[Groups(['fs_trop_percu:read', 'fs_trop_percu:write'])]
     private ?string $status = 'disponible';
 
     #[ORM\Column(type: Types::DATETIME_MUTABLE)]
+    #[Groups(['fs_trop_percu:read'])]
     private ?\DateTimeInterface $dateCreation = null;
 
     #[ORM\ManyToOne(targetEntity: User::class)]
     #[ORM\JoinColumn(nullable: false)]
+    #[Groups(['fs_trop_percu:read', 'fs_trop_percu:write'])]
     private ?User $createdBy = null;
 
     #[ORM\Column(type: Types::TEXT, nullable: true)]
+    #[Groups(['fs_trop_percu:read', 'fs_trop_percu:write'])]
     private ?string $commentaire = null;
 
     /**
@@ -48,6 +77,7 @@ class FactureSituationTropPercu
      */
     #[ORM\OneToMany(targetEntity: FactureSituationTropPercuUtilisation::class, mappedBy: 'tropPercu', orphanRemoval: true)]
     #[ORM\OrderBy(['dateUtilisation' => 'DESC'])]
+    #[Groups(['fs_trop_percu:read'])]
     private Collection $utilisations;
 
     public function __construct()

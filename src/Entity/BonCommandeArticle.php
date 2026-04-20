@@ -2,32 +2,59 @@
 
 namespace App\Entity;
 
+use ApiPlatform\Doctrine\Orm\Filter\SearchFilter;
+use ApiPlatform\Metadata\ApiFilter;
+use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Metadata\Delete;
+use ApiPlatform\Metadata\Get;
+use ApiPlatform\Metadata\GetCollection;
+use ApiPlatform\Metadata\Patch;
+use ApiPlatform\Metadata\Post;
 use App\Repository\BonCommandeArticleRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Serializer\Attribute\Groups;
 
+#[ApiResource(
+    operations: [
+        new GetCollection(security: "is_granted('ROLE_USER')"),
+        new Get(security: "is_granted('ROLE_USER')"),
+        new Post(security: "is_granted('ROLE_USER')"),
+        new Patch(security: "is_granted('ROLE_USER')"),
+        new Delete(security: "is_granted('ROLE_USER')"),
+    ],
+    normalizationContext: ['groups' => ['bon_commande_article:read', 'bon_commande:read']],
+    denormalizationContext: ['groups' => ['bon_commande_article:write']],
+)]
+#[ApiFilter(SearchFilter::class, properties: ['bonCommande' => 'exact'])]
 #[ORM\Entity(repositoryClass: BonCommandeArticleRepository::class)]
 class BonCommandeArticle
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
+    #[Groups(['bon_commande_article:read', 'bon_commande:read'])]
     private ?int $id = null;
 
     #[ORM\ManyToOne(inversedBy: 'bonCommandeArticles')]
     #[ORM\JoinColumn(nullable: false)]
+    #[Groups(['bon_commande_article:read', 'bon_commande_article:write'])]
     private ?BonCommande $bonCommande = null;
 
     #[ORM\Column(length: 150)]
+    #[Groups(['bon_commande_article:read', 'bon_commande_article:write', 'bon_commande:read'])]
     private ?string $reference = null;
 
     #[ORM\Column(type: Types::TEXT)]
+    #[Groups(['bon_commande_article:read', 'bon_commande_article:write', 'bon_commande:read'])]
     private ?string $designation = null;
 
     #[ORM\Column(length: 10)]
+    #[Groups(['bon_commande_article:read', 'bon_commande_article:write', 'bon_commande:read'])]
     private ?int $qte = null;
 
     #[ORM\Column(nullable: true)]
+    #[Groups(['bon_commande_article:read', 'bon_commande_article:write', 'bon_commande:read'])]
     private ?float $prixUnitaireHt = null;
 
     public function getId(): ?int

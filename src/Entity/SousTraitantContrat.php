@@ -2,12 +2,33 @@
 
 namespace App\Entity;
 
+use ApiPlatform\Doctrine\Orm\Filter\SearchFilter;
+use ApiPlatform\Metadata\ApiFilter;
+use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Metadata\Delete;
+use ApiPlatform\Metadata\Get;
+use ApiPlatform\Metadata\GetCollection;
+use ApiPlatform\Metadata\Patch;
+use ApiPlatform\Metadata\Post;
 use App\Repository\SousTraitantContratRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Serializer\Attribute\Groups;
 
+#[ApiResource(
+    operations: [
+        new GetCollection(security: "is_granted('ROLE_USER')"),
+        new Get(security: "is_granted('ROLE_USER')"),
+        new Post(security: "is_granted('ROLE_USER')"),
+        new Patch(security: "is_granted('ROLE_USER')"),
+        new Delete(security: "is_granted('ROLE_USER')"),
+    ],
+    normalizationContext: ['groups' => ['sous_traitant_contrat:read', 'sous_traitant:read']],
+    denormalizationContext: ['groups' => ['sous_traitant_contrat:write']],
+)]
+#[ApiFilter(SearchFilter::class, properties: ['sousTraitant' => 'exact'])]
 #[ORM\Entity(repositoryClass: SousTraitantContratRepository::class)]
 #[ORM\Table(name: 'sous_traitant_contrat')]
 class SousTraitantContrat
@@ -15,29 +36,37 @@ class SousTraitantContrat
      #[ORM\Id]
      #[ORM\GeneratedValue]
      #[ORM\Column]
+     #[Groups(['sous_traitant_contrat:read', 'sous_traitant:read'])]
      private ?int $id = null;
 
      #[ORM\Column(type: Types::DATE_MUTABLE)]
+     #[Groups(['sous_traitant_contrat:read', 'sous_traitant_contrat:write', 'sous_traitant:read'])]
      private ?\DateTimeInterface $date = null;
 
      #[ORM\Column]
+     #[Groups(['sous_traitant_contrat:read', 'sous_traitant:read'])]
      private ?\DateTimeImmutable $createdAt = null;
 
      #[ORM\Column(nullable: true)]
+     #[Groups(['sous_traitant_contrat:read'])]
      private ?\DateTimeImmutable $updatedAt = null;
 
      #[ORM\ManyToOne(fetch: 'EAGER')]
+     #[Groups(['sous_traitant_contrat:read'])]
      private ?User $createdUser = null;
 
      #[ORM\ManyToOne(inversedBy: 'contrats', fetch: 'EAGER')]
      #[ORM\JoinColumn(nullable: false)]
+     #[Groups(['sous_traitant_contrat:read', 'sous_traitant_contrat:write'])]
      private ?SousTraitent $sousTraitant = null;
 
      #[ORM\ManyToOne(fetch: 'EAGER')]
      #[ORM\JoinColumn(name: 'fichier_id', referencedColumnName: 'id', nullable: true)]
+     #[Groups(['sous_traitant_contrat:read', 'sous_traitant_contrat:write'])]
      private ?Uploads $fichier = null;
 
      #[ORM\OneToMany(mappedBy: 'contrat', targetEntity: SousTraitantAvenant::class, cascade: ['persist', 'remove'], fetch: 'LAZY')]
+     #[Groups(['sous_traitant_contrat:read', 'sous_traitant:read'])]
      private Collection $avenants;
 
 

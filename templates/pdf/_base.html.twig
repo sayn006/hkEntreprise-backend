@@ -5,7 +5,7 @@
     <title>{% block title %}Document{% endblock %}</title>
     <style>
         @page {
-            margin: 42px 54px 140px 54px;
+            margin: 42px 54px 42px 54px;
         }
 
         * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -207,25 +207,22 @@
         }
         .payment-terms p { margin-bottom: 4px; }
 
-        /* ===== FOOTER ===== */
-        .footer {
-            position: fixed;
-            bottom: -104px;
-            left: 0;
-            right: 0;
-            padding-top: 12px;
+        /* ===== FOOTER INLINE (en fin de contenu, pas fixed) ===== */
+        .footer-inline {
+            margin-top: 60px;
+            padding-top: 14px;
             border-top: 1px solid #e4e4e4;
             font-size: 8.5px;
             color: #777;
             line-height: 1.75;
+            page-break-inside: avoid;
         }
-        .footer .company-footer-name {
+        .footer-inline .company-footer-name {
             font-weight: 700;
             color: #222;
             margin-bottom: 2px;
         }
-        .footer a { color: #1B7A8A; text-decoration: none; }
-        .footer .mentions { font-size: 8px; color: #888; margin-top: 3px; }
+        .footer-inline .mentions { font-size: 8px; color: #888; margin-top: 3px; }
 
         /* ===== SIGNATURE ===== */
         .signature-section {
@@ -265,14 +262,19 @@
 </head>
 <body>
 
-    {# ===== HEADER DE PAGE (petit, sur chaque page) ===== #}
-    <div class="page-head">
-        <div class="page-head-left">{% block page_head_left %}{% endblock %}</div>
-        <div class="page-head-right"><span class="pagenum"></span></div>
+    {# ===== LOGO + NOM (page 1) ===== #}
+    <div class="brand-block">
+        {% if entreprise.logo %}
+            <img src="{{ entreprise.logo }}" class="company-logo" alt="{{ entreprise.nom }}">
+        {% endif %}
+        <div class="company-name">{{ entreprise.nom }}</div>
     </div>
 
-    {# ===== FOOTER (mentions légales sur chaque page) ===== #}
-    <div class="footer">
+    {# ===== CORPS DU DOCUMENT ===== #}
+    {% block content %}{% endblock %}
+
+    {# ===== MENTIONS LÉGALES EN FIN DE DOCUMENT ===== #}
+    <div class="footer-inline">
         <div class="company-footer-name">{{ entreprise.nom }}</div>
         {% if entreprise.adresse %}Siège social : {{ entreprise.adresse }}{% if entreprise.codePostal %}, {{ entreprise.codePostal }} {{ entreprise.ville }}{% endif %}<br>{% endif %}
         {% if entreprise.formeJuridique %}{{ entreprise.formeJuridique }}{% if entreprise.capital %} au capital de {{ entreprise.capital }}{% endif %}<br>{% endif %}
@@ -283,17 +285,6 @@
         {% if entreprise.email %}<br>{{ entreprise.email }}{% endif %}
         {% if entreprise.mentionsLegales %}<div class="mentions">{{ entreprise.mentionsLegales|raw }}</div>{% endif %}
     </div>
-
-    {# ===== LOGO + NOM (page 1 uniquement) ===== #}
-    <div class="brand-block">
-        {% if entreprise.logo %}
-            <img src="{{ entreprise.logo }}" class="company-logo" alt="{{ entreprise.nom }}">
-        {% endif %}
-        <div class="company-name">{{ entreprise.nom }}</div>
-    </div>
-
-    {# ===== CORPS DU DOCUMENT ===== #}
-    {% block content %}{% endblock %}
 
 </body>
 </html>

@@ -83,6 +83,13 @@ class FactureSituation
      #[ORM\Column(type: Types::DATETIME_MUTABLE, nullable: true)]
      private ?\DateTimeInterface $envoyeAt = null;
 
+     /**
+      * Indique si cette facture correspond à un Décompte Général Définitif (DGD).
+      * Un DGD libère la retenue de garantie cumulée à la clôture du chantier.
+      */
+     #[ORM\Column(type: 'boolean', options: ['default' => false])]
+     private bool $isDgd = false;
+
      public function __construct()
      {
           $this->facturationTravaux = new ArrayCollection();
@@ -526,6 +533,17 @@ class FactureSituation
      public function setEnvoyeAt(?\DateTimeInterface $envoyeAt): self
      {
           $this->envoyeAt = $envoyeAt;
+          return $this;
+     }
+
+     public function isDgd(): bool
+     {
+          return $this->isDgd;
+     }
+
+     public function setIsDgd(bool $isDgd): self
+     {
+          $this->isDgd = $isDgd;
           return $this;
      }
 

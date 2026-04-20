@@ -1,23 +1,31 @@
 {% extends 'pdf/_base.html.twig' %}
 
-{% block title %}Situation {{ situation.numeroFacture }}{% endblock %}
+{% block title %}{% if situation.isDgd %}DGD{% else %}Situation{% endif %} {{ situation.numeroFacture }}{% endblock %}
 
 {% block content %}
 
     {% set chantier = situation.chantier %}
     {% set client   = chantier ? chantier.client : null %}
+    {% set isDgd    = situation.isDgd %}
 
     {# ===== TITRE + CLIENT ===== #}
     <div class="doc-title-row">
         <div class="doc-title-cell">
-            <div class="doc-title-main">Situation n° {{ situation.numeroFacture ?: situation.id }}</div>
+            <div class="doc-title-main">
+                {% if isDgd %}Décompte Général Définitif{% else %}Situation{% endif %}
+                n° {{ situation.numeroFacture ?: situation.id }}
+            </div>
             <div class="doc-title-sub">
-                N° situation : <strong>{{ situation.numSituation ?: '—' }}</strong><br>
+                {% if isDgd %}
+                    <strong style="color:#B45309;">Clôture de chantier — libération de la retenue de garantie</strong><br>
+                {% else %}
+                    N° situation : <strong>{{ situation.numSituation ?: '—' }}</strong><br>
+                {% endif %}
                 Date : {{ situation.dateSituation ? situation.dateSituation|date('d/m/Y') : 'N/A' }}<br>
                 {% if chantier %}
                     Chantier : {{ chantier.nom }}{% if chantier.villeChantier %} — {{ chantier.villeChantier }}{% endif %}<br>
                 {% endif %}
-                {% if situation.titre %}{{ situation.titre }}{% endif %}
+                {% if situation.titre and not isDgd %}{{ situation.titre }}{% endif %}
             </div>
         </div>
         {% if client %}

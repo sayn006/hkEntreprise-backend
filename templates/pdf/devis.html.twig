@@ -46,7 +46,8 @@
         </thead>
         <tbody>
             {% set totalHT = 0 %}
-            {% set tvaMap = {} %}
+            {% set totalTVA = 0 %}
+            {% set defaultTvaRate = null %}
 
             {% for detail in details %}
                 {% if detail.lineType == 'BH' %}
@@ -56,12 +57,9 @@
                 {% elseif detail.lineType == 'RL' %}
                     {% set lineTotal = (detail.quantite|default(0)) * (detail.prixUnitaire|default(0)) %}
                     {% set totalHT = totalHT + lineTotal %}
-                    {% set tvaKey = (detail.tva and detail.tva > 0) ? detail.tva : 20 %}
-                    {% if attribute(tvaMap, tvaKey) is defined %}
-                        {% set tvaMap = tvaMap|merge({(tvaKey): attribute(tvaMap, tvaKey) + lineTotal}) %}
-                    {% else %}
-                        {% set tvaMap = tvaMap|merge({(tvaKey): lineTotal}) %}
-                    {% endif %}
+                    {% set lineTva = (detail.tva is not empty and detail.tva > 0) ? (detail.tva + 0) : 20 %}
+                    {% set totalTVA = totalTVA + lineTotal * lineTva / 100 %}
+                    {% if defaultTvaRate is null %}{% set defaultTvaRate = lineTva %}{% endif %}
                     <tr>
                         <td class="cell-desc">
                             {% if detail.reference %}<span style="color:#999;font-size:8.5px;">[{{ detail.reference }}]</span> {% endif %}
@@ -88,7 +86,6 @@
     </table>
 
     {# ===== TOTAUX ===== #}
-    {% set totalTVA = 0 %}
     <div class="totals-wrap">
         <div class="totals-spacer"></div>
         <div class="totals-box">
@@ -96,21 +93,10 @@
                 <span class="total-label">Total HT</span>
                 <span class="total-value">{{ totalHT|number_format(2, ',', ' ') }} €</span>
             </div>
-            {% for tvaRate, base in tvaMap %}
-                {% set tvaAmount = base * (tvaRate / 100) %}
-                {% set totalTVA = totalTVA + tvaAmount %}
-                <div class="total-row">
-                    <span class="total-label">TVA {{ tvaRate }} %</span>
-                    <span class="total-value">{{ tvaAmount|number_format(2, ',', ' ') }} €</span>
-                </div>
-            {% endfor %}
-            {% if tvaMap is empty %}
-                {% set totalTVA = totalHT * 0.20 %}
-                <div class="total-row">
-                    <span class="total-label">TVA 20 %</span>
-                    <span class="total-value">{{ totalTVA|number_format(2, ',', ' ') }} €</span>
-                </div>
-            {% endif %}
+            <div class="total-row">
+                <span class="total-label">TVA {{ defaultTvaRate ?: 20 }} %</span>
+                <span class="total-value">{{ totalTVA|number_format(2, ',', ' ') }} €</span>
+            </div>
             <div class="total-row total-ttc">
                 <span class="total-label">Total TTC</span>
                 <span class="total-value">{{ (totalHT + totalTVA)|number_format(2, ',', ' ') }} €</span>

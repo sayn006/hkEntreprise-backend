@@ -416,6 +416,16 @@ class DevisAvancementDetail
     }
 
     /**
+     * Alias exposé à l'API (Symfony serializer ne détecte pas toujours les getters is*()
+     * sur une propriété nommée "isFoo"). Retourne le même flag.
+     */
+    #[Groups(['devis_avancement_detail:read', 'devis_avancement:read'])]
+    public function getTravauxSup(): bool
+    {
+        return $this->isTravauxSupplementaires;
+    }
+
+    /**
      * Copie les données depuis un travail supplémentaire de l'avancement précédent
      */
     public function copyFromTravauxSupplementaires(DevisAvancementDetail $source): static

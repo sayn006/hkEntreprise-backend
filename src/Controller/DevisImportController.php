@@ -20,11 +20,13 @@ use Symfony\Component\Security\Http\Attribute\IsGranted;
  * Import de lignes de devis depuis un fichier Excel (xlsx).
  *
  * Workflow :
- *  - GET  /api/devis/import-template         → xlsx modèle à télécharger
+ *  - GET  /api/devis-import/template         → xlsx modèle à télécharger
  *  - POST /api/devis/{id}/import-preview     → upload xlsx, renvoie colonnes + suggestion mapping
  *  - POST /api/devis/{id}/import             → applique mapping, crée les DevisDetail
+ *
+ * Note: la route template est hors de /api/devis/* pour éviter le conflit
+ * avec la route ApiPlatform `/api/devis/{id}` (Get item).
  */
-#[Route('/api/devis')]
 #[IsGranted('ROLE_USER')]
 class DevisImportController extends AbstractController
 {
@@ -49,7 +51,7 @@ class DevisImportController extends AbstractController
     /**
      * Génère et renvoie un fichier XLSX modèle avec en-têtes français et exemples.
      */
-    #[Route('/import-template', name: 'api_devis_import_template', methods: ['GET'])]
+    #[Route('/api/devis-import/template', name: 'api_devis_import_template', methods: ['GET'])]
     public function template(): StreamedResponse
     {
         $spreadsheet = new Spreadsheet();
@@ -87,7 +89,7 @@ class DevisImportController extends AbstractController
     /**
      * Parse le xlsx uploadé et renvoie colonnes détectées + suggestion de mapping.
      */
-    #[Route('/{id}/import-preview', name: 'api_devis_import_preview', methods: ['POST'], requirements: ['id' => '\d+'])]
+    #[Route('/api/devis/{id}/import-preview', name: 'api_devis_import_preview', methods: ['POST'], requirements: ['id' => '\d+'])]
     public function preview(Devis $devis, Request $request): JsonResponse
     {
         $file = $request->files->get('file');
@@ -139,7 +141,7 @@ class DevisImportController extends AbstractController
      *
      * multipart: file=xlsx, mapping=JSON string (ex: {"Désignation":"designation","Qté":"quantite"})
      */
-    #[Route('/{id}/import', name: 'api_devis_import', methods: ['POST'], requirements: ['id' => '\d+'])]
+    #[Route('/api/devis/{id}/import', name: 'api_devis_import', methods: ['POST'], requirements: ['id' => '\d+'])]
     public function import(Devis $devis, Request $request): JsonResponse
     {
         $file = $request->files->get('file');

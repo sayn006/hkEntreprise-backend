@@ -271,7 +271,8 @@
     {# ===== LOGO + NOM (page 1) ===== #}
     <div class="brand-block">
         {% if entreprise.logo %}
-            <img src="{{ entreprise.logo }}" class="company-logo" alt="{{ entreprise.nom }}">
+            {% set logoUrl = entreprise.logo starts with 'http' ? entreprise.logo : 'https://hk-api.cashloose.com' ~ entreprise.logo %}
+            <img src="{{ logoUrl }}" class="company-logo" alt="{{ entreprise.nom }}">
         {% endif %}
         <div class="company-name">{{ entreprise.nom }}</div>
     </div>

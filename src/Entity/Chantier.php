@@ -165,6 +165,28 @@ class Chantier
     private ?string $pourcentageRetenue = '5.00';
 
     /**
+     * Révision de prix activée sur ce marché (BT01, TP01, etc.).
+     */
+    #[ORM\Column(type: Types::BOOLEAN, options: ['default' => false])]
+    #[Groups(['chantier:read', 'chantier:write'])]
+    private bool $prixRevisable = false;
+
+    /**
+     * Type d'indice BTP utilisé pour la révision (BT01, TP01, BT40, etc.).
+     */
+    #[ORM\Column(length: 20, nullable: true)]
+    #[Groups(['chantier:read', 'chantier:write'])]
+    private ?string $indiceType = null;
+
+    /**
+     * Mois de référence du marché (premier du mois), utilisé comme I_base dans
+     * la formule K = 0.15 + 0.85 × (I_actuel / I_base).
+     */
+    #[ORM\Column(type: Types::DATE_MUTABLE, nullable: true)]
+    #[Groups(['chantier:read', 'chantier:write'])]
+    private ?\DateTimeInterface $indiceBaseMois = null;
+
+    /**
      * Latitude GPS du chantier pour vérification géolocalisation
      */
     #[ORM\Column(type: Types::DECIMAL, precision: 10, scale: 7, nullable: true)]
@@ -845,6 +867,49 @@ class Chantier
             }
         }
 
+        return $this;
+    }
+
+    // ============================================================================
+    // RÉVISION DE PRIX (indices BTP)
+    // ============================================================================
+
+    public function isPrixRevisable(): bool
+    {
+        return $this->prixRevisable;
+    }
+
+    public function setPrixRevisable(bool $prixRevisable): static
+    {
+        $this->prixRevisable = $prixRevisable;
+        return $this;
+    }
+
+    public function getIndiceType(): ?string
+    {
+        return $this->indiceType;
+    }
+
+    public function setIndiceType(?string $indiceType): static
+    {
+        $this->indiceType = $indiceType ? strtoupper(trim($indiceType)) : null;
+        return $this;
+    }
+
+    public function getIndiceBaseMois(): ?\DateTimeInterface
+    {
+        return $this->indiceBaseMois;
+    }
+
+    public function setIndiceBaseMois(?\DateTimeInterface $indiceBaseMois): static
+    {
+        if ($indiceBaseMois) {
+            $first = (clone $indiceBaseMois)->modify('first day of this month');
+            $first->setTime(0, 0, 0);
+            $this->indiceBaseMois = $first;
+        } else {
+            $this->indiceBaseMois = null;
+        }
         return $this;
     }
 }

@@ -29,6 +29,7 @@ class SituationBuilderService
     public function __construct(
         private EntityManagerInterface $em,
         private DevisAvancementRepository $avancementRepo,
+        private PrixRevisionCalculator $revisionCalculator,
     ) {}
 
     public function buildFromAvancement(DevisAvancement $avancement): ?FactureSituation
@@ -129,9 +130,33 @@ class SituationBuilderService
             $this->em->persist($retenue);
         }
 
+        // === 4bis. Révision de prix BTP (si chantier révisable) ===
+        $montantRevisionMois = 0.0;
+        if ($chantier && $chantier->isPrixRevisable()) {
+            $moisSituation = $situation->getDateSituation() ?? new \DateTime();
+            $rev = $this->revisionCalculator->computeRevision($chantier, $moisSituation, $sumMontantMois);
+            if ($rev['applicable'] && abs($rev['montant']) > 0.005) {
+                $montantRevisionMois = (float) $rev['montant'];
+                $coef = $rev['coefficient'];
+                $revLine = new FactureSituationFacturationTravaux();
+                $revLine->setSituation($situation);
+                $revLine->setType('REVISION');
+                $revLine->setDesignation(sprintf(
+                    'Révision de prix (%s, K=%.4f)',
+                    $chantier->getIndiceType() ?? '—',
+                    $coef ?? 0.0
+                ));
+                $revLine->setMontant(number_format($montantRevisionMois, 2, '.', ''));
+                $revLine->setCumule(number_format($montantRevisionMois, 2, '.', ''));
+                $revLine->setCumuleAnterieur('0.00');
+                $revLine->setFacturationFinDuMois(number_format($montantRevisionMois, 2, '.', ''));
+                $this->em->persist($revLine);
+            }
+        }
+
         // === 5. Totaux ===
-        $totalHtMois        = $sumMontantMois + $montantRetenueMois;
-        $totalHtCumule      = $sumCumule + $cumulRetenue;
+        $totalHtMois        = $sumMontantMois + $montantRetenueMois + $montantRevisionMois;
+        $totalHtCumule      = $sumCumule + $cumulRetenue + $montantRevisionMois;
         $totalHtCumuleAnt   = $sumCumuleAnterieur + $cumulRetenueAnt;
 
         $tvaMois        = $totalHtMois * $tvaPercent / 100.0;

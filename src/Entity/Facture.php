@@ -73,12 +73,6 @@ class Facture
     private ?string $remarques = null;
 
     /**
-     * @var Collection<int, Situation>
-     */
-    #[ORM\OneToMany(targetEntity: Situation::class, mappedBy: 'facture', cascade: ['persist', 'remove'])]
-    private Collection $situations;
-
-    /**
      * @var Collection<int, FactureLigne>
      */
     #[ORM\OneToMany(targetEntity: FactureLigne::class, mappedBy: 'facture', cascade: ['persist', 'remove'], orphanRemoval: true)]
@@ -87,7 +81,6 @@ class Facture
 
     public function __construct()
     {
-        $this->situations = new ArrayCollection();
         $this->lignes = new ArrayCollection();
     }
 
@@ -181,36 +174,6 @@ class Facture
     public function setRemarques(?string $remarques): static
     {
         $this->remarques = $remarques;
-        return $this;
-    }
-
-    /**
-     * @return Collection<int, Situation>
-     */
-    public function getSituations(): Collection
-    {
-        return $this->situations;
-    }
-
-    public function addSituation(Situation $situation): static
-    {
-        if (!$this->situations->contains($situation)) {
-            $this->situations->add($situation);
-            $situation->setFacture($this);
-        }
-
-        return $this;
-    }
-
-    public function removeSituation(Situation $situation): static
-    {
-        if ($this->situations->removeElement($situation)) {
-            // set the owning side to null (unless already changed)
-            if ($situation->getFacture() === $this) {
-                $situation->setFacture(null);
-            }
-        }
-
         return $this;
     }
 

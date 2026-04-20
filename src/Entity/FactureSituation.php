@@ -279,13 +279,7 @@ class FactureSituation
                'entity_type' => 'FactureSituation'
           ]);
 
-          // Vérifier également les documents avec entity_type 'Situation'
-          $situationUploads = $entityManager->getRepository(Uploads::class)->findBy([
-               'entityId' => $this->getId(),
-               'entity_type' => 'Situation'
-          ]);
-
-          return array_merge($uploads, $situationUploads);
+          return $uploads;
      }
 
      /**

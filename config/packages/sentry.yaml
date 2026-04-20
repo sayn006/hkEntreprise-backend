@@ -1,0 +1,7 @@
+sentry:
+    dsn: '%env(default::SENTRY_DSN)%'
+    options:
+        environment: '%kernel.environment%'
+        release: '%env(default::COOLIFY_DEPLOYMENT_UUID)%'
+        traces_sample_rate: 0.1
+        send_default_pii: false

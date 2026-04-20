@@ -39,7 +39,7 @@ class Client
     private ?int $id = null;
 
     #[ORM\Column(length: 255)]
-    #[Groups(['client:read', 'client:write', 'chantier:read', 'facture:read'])]
+    #[Groups(['client:read', 'client:write', 'chantier:read', 'facture:read', 'devis:read'])]
     #[Assert\NotBlank(message: 'La raison sociale est obligatoire.')]
     private ?string $raisonSocial = null;
 
@@ -54,11 +54,11 @@ class Client
     private ?string $sirenSiret = null;
 
     #[ORM\Column(length: 25, nullable: true)]
-    #[Groups(['client:read', 'client:write', 'chantier:read', 'facture:read'])]
+    #[Groups(['client:read', 'client:write', 'chantier:read', 'facture:read', 'devis:read'])]
     private ?string $telephone = null;
 
     #[ORM\Column(length: 200, nullable: true)]
-    #[Groups(['client:read', 'client:write', 'chantier:read', 'facture:read'])]
+    #[Groups(['client:read', 'client:write', 'chantier:read', 'facture:read', 'devis:read'])]
     private ?string $email = null;
 
     #[ORM\ManyToOne(targetEntity: self::class)]

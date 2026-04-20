@@ -130,7 +130,7 @@ class Chantier
     private Collection $suiviFactures;
 
     #[ORM\ManyToOne(inversedBy: 'chantiers')]
-    #[Groups(['chantier:read', 'chantier:write'])]
+    #[Groups(['chantier:read', 'chantier:write', 'devis:read', 'facture:read'])]
     #[MaxDepth(1)]
     private ?Client $client = null;
 

@@ -119,6 +119,31 @@ class Entreprise
     #[Groups(['entreprise:read', 'entreprise:write'])]
     private ?string $mentionsLegales = null;
 
+    // Emails "from" par type de document
+    #[ORM\Column(length: 255, nullable: true)]
+    #[Groups(['entreprise:read', 'entreprise:write'])]
+    private ?string $emailDefault = null;
+
+    #[ORM\Column(length: 255, nullable: true)]
+    #[Groups(['entreprise:read', 'entreprise:write'])]
+    private ?string $emailDevis = null;
+
+    #[ORM\Column(length: 255, nullable: true)]
+    #[Groups(['entreprise:read', 'entreprise:write'])]
+    private ?string $emailFacture = null;
+
+    #[ORM\Column(length: 255, nullable: true)]
+    #[Groups(['entreprise:read', 'entreprise:write'])]
+    private ?string $emailAvancement = null;
+
+    #[ORM\Column(length: 255, nullable: true)]
+    #[Groups(['entreprise:read', 'entreprise:write'])]
+    private ?string $emailSituation = null;
+
+    #[ORM\Column(length: 255, nullable: true)]
+    #[Groups(['entreprise:read', 'entreprise:write'])]
+    private ?string $emailBonCommande = null;
+
     // Getters / Setters
     public function getId(): ?int { return $this->id; }
     public function getNom(): ?string { return $this->nom; }
@@ -165,4 +190,34 @@ class Entreprise
     public function setModeReglement(?string $v): static { $this->modeReglement = $v; return $this; }
     public function getMentionsLegales(): ?string { return $this->mentionsLegales; }
     public function setMentionsLegales(?string $v): static { $this->mentionsLegales = $v; return $this; }
+
+    public function getEmailDefault(): ?string { return $this->emailDefault; }
+    public function setEmailDefault(?string $v): static { $this->emailDefault = $v; return $this; }
+    public function getEmailDevis(): ?string { return $this->emailDevis; }
+    public function setEmailDevis(?string $v): static { $this->emailDevis = $v; return $this; }
+    public function getEmailFacture(): ?string { return $this->emailFacture; }
+    public function setEmailFacture(?string $v): static { $this->emailFacture = $v; return $this; }
+    public function getEmailAvancement(): ?string { return $this->emailAvancement; }
+    public function setEmailAvancement(?string $v): static { $this->emailAvancement = $v; return $this; }
+    public function getEmailSituation(): ?string { return $this->emailSituation; }
+    public function setEmailSituation(?string $v): static { $this->emailSituation = $v; return $this; }
+    public function getEmailBonCommande(): ?string { return $this->emailBonCommande; }
+    public function setEmailBonCommande(?string $v): static { $this->emailBonCommande = $v; return $this; }
+
+    /**
+     * Résout l'adresse email "from" pour un type de document donné.
+     * Fallback: override type > emailDefault > email contact > null
+     */
+    public function resolveFromEmail(string $type): ?string
+    {
+        $override = match ($type) {
+            'devis'        => $this->emailDevis,
+            'facture'      => $this->emailFacture,
+            'avancement'   => $this->emailAvancement,
+            'situation'    => $this->emailSituation,
+            'bon_commande' => $this->emailBonCommande,
+            default        => null,
+        };
+        return $override ?: ($this->emailDefault ?: $this->email);
+    }
 }

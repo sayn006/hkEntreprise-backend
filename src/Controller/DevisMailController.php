@@ -54,8 +54,9 @@ class DevisMailController extends AbstractController
         }
 
         $entreprise = $this->entrepriseRepo->findOneBy([]);
-        $fromEmail = $_ENV['MAILER_FROM']
-            ?? $entreprise?->getEmail()
+        // Priorité : override emailDevis > emailDefault > email contact > MAILER_FROM
+        $fromEmail = $entreprise?->resolveFromEmail('devis')
+            ?? $_ENV['MAILER_FROM']
             ?? 'no-reply@hk-entreprise.fr';
         $fromName = $entreprise?->getNom() ?? 'HK Entreprise';
 

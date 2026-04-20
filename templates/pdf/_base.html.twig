@@ -4,294 +4,296 @@
     <meta charset="UTF-8">
     <title>{% block title %}Document{% endblock %}</title>
     <style>
+        @page {
+            margin: 42px 54px 140px 54px;
+        }
+
         * { margin: 0; padding: 0; box-sizing: border-box; }
 
         body {
-            font-family: 'Helvetica Neue', Arial, sans-serif;
+            font-family: 'Helvetica', 'Arial', sans-serif;
             font-size: 10px;
-            line-height: 1.4;
-            color: #333;
-            padding: 20px;
+            line-height: 1.55;
+            color: #222;
+            font-weight: 300;
         }
 
-        /* ===== HEADER ===== */
-        .header {
+        /* ===== PAGE HEADER (petit, haut de page, sur chaque page via fixed) ===== */
+        .page-head {
+            position: fixed;
+            top: -24px;
+            left: 0;
+            right: 0;
             display: table;
             width: 100%;
-            margin-bottom: 20px;
-            border-bottom: 3px solid #1a237e;
-            padding-bottom: 15px;
+            font-size: 9px;
+            color: #6b6b6b;
         }
-        .header-left, .header-right {
+        .page-head-left, .page-head-right {
             display: table-cell;
             vertical-align: top;
         }
-        .header-left { width: 55%; }
-        .header-right { width: 45%; text-align: right; }
+        .page-head-right { text-align: right; }
 
-        .company-logo { max-width: 160px; max-height: 70px; margin-bottom: 8px; }
-
+        /* ===== LOGO + NOM ENTREPRISE (uniquement page 1) ===== */
+        .brand-block {
+            margin-bottom: 26px;
+        }
+        .company-logo {
+            max-width: 120px;
+            max-height: 56px;
+            margin-bottom: 8px;
+        }
         .company-name {
-            font-size: 18px;
-            font-weight: bold;
-            color: #1a237e;
-            margin-bottom: 4px;
-        }
-        .company-info {
-            font-size: 9px;
-            color: #555;
-            line-height: 1.6;
+            font-size: 14px;
+            font-weight: 700;
+            color: #1B7A8A;
+            letter-spacing: 0.3px;
         }
 
-        /* ===== TITRE DOCUMENT ===== */
-        .document-title {
-            background: linear-gradient(135deg, #1a237e 0%, #283593 100%);
-            color: white;
-            padding: 14px 18px;
-            margin: 18px 0;
-            border-radius: 4px;
-        }
-        .document-title h1 {
-            font-size: 16px;
-            font-weight: bold;
-            margin-bottom: 6px;
-        }
-        .document-meta {
+        /* ===== TITRE + CLIENT (deux colonnes) ===== */
+        .doc-title-row {
             display: table;
             width: 100%;
+            margin-bottom: 34px;
         }
-        .document-meta span {
+        .doc-title-cell, .doc-client-cell {
             display: table-cell;
-            font-size: 9px;
-            opacity: 0.9;
+            vertical-align: top;
+            width: 55%;
         }
+        .doc-client-cell { width: 45%; text-align: right; }
 
-        /* ===== CLIENT / DESTINATAIRE ===== */
-        .recipient-block {
-            float: right;
-            background: #f5f5f5;
-            border: 1px solid #ddd;
-            border-radius: 4px;
-            padding: 10px 14px;
-            min-width: 220px;
-            margin-bottom: 15px;
-        }
-        .recipient-label {
-            font-size: 8px;
-            text-transform: uppercase;
-            color: #888;
-            margin-bottom: 4px;
-            letter-spacing: 0.5px;
-        }
-        .recipient-name {
-            font-weight: bold;
-            font-size: 11px;
-            color: #333;
-        }
-        .recipient-info {
-            font-size: 9px;
-            color: #555;
-            margin-top: 2px;
-            line-height: 1.5;
-        }
-        .clearfix::after { content: ''; display: table; clear: both; }
-
-        /* ===== SECTIONS INFO ===== */
-        .info-section {
-            background: #fff;
-            border: 1px solid #e0e0e0;
-            border-radius: 4px;
-            padding: 10px 12px;
-            margin-bottom: 14px;
-        }
-        .info-section-title {
-            font-size: 8px;
-            text-transform: uppercase;
-            color: #888;
-            letter-spacing: 0.5px;
+        .doc-title-main {
+            font-size: 16px;
+            font-weight: 700;
+            color: #111;
+            letter-spacing: -0.1px;
             margin-bottom: 6px;
-            border-bottom: 1px solid #eee;
-            padding-bottom: 4px;
+        }
+        .doc-title-sub {
+            font-size: 9.5px;
+            color: #555;
+            line-height: 1.7;
+        }
+        .doc-title-sub strong {
+            color: #222;
+            font-weight: 500;
+        }
+
+        .client-name {
+            font-size: 12px;
+            font-weight: 700;
+            color: #111;
+            margin-bottom: 6px;
+            letter-spacing: 0.2px;
+        }
+        .client-addr {
+            font-size: 9.5px;
+            color: #555;
+            line-height: 1.7;
         }
 
         /* ===== TABLEAU LIGNES ===== */
         .details-table {
             width: 100%;
             border-collapse: collapse;
-            margin: 14px 0;
-            font-size: 9px;
+            margin: 8px 0 14px;
+            font-size: 9.5px;
         }
         .details-table thead tr {
-            background: #1a237e;
-            color: white;
+            border-bottom: 1px solid #d9d9d9;
         }
         .details-table th {
-            padding: 7px 6px;
+            padding: 10px 6px;
             text-align: left;
             font-weight: 600;
-            font-size: 8.5px;
+            font-size: 8px;
+            letter-spacing: 1.2px;
             text-transform: uppercase;
-            letter-spacing: 0.3px;
+            color: #777;
         }
         .details-table td {
-            padding: 5px 6px;
+            padding: 11px 6px;
             border-bottom: 1px solid #f0f0f0;
             vertical-align: top;
+            color: #222;
+            font-weight: 300;
         }
-        .details-table tr:nth-child(even) td { background: #fafafa; }
         .details-table tr.bloc-row td {
-            background: #cfe2ff;
-            font-weight: bold;
-            font-size: 9.5px;
-            color: #084298;
-            padding: 6px;
+            background: transparent;
+            font-weight: 700;
+            color: #1B7A8A;
+            padding: 14px 6px 6px;
+            font-size: 10px;
+            letter-spacing: 0.3px;
+            border-bottom: 1px solid #e4e4e4;
+            text-transform: uppercase;
         }
-        .details-table tr.hors-bloc td { background: #fff3cd; }
+        .details-table tr.comment-row td {
+            color: #777;
+            font-style: italic;
+            padding: 6px 6px;
+            font-size: 9px;
+            border-bottom: 1px solid #f5f5f5;
+        }
+        .details-table .cell-num { font-variant-numeric: tabular-nums; }
+        .details-table .cell-desc { color: #222; font-weight: 400; }
         .text-right { text-align: right; }
         .text-center { text-align: center; }
 
-        /* ===== TOTAUX ===== */
-        .totals-section {
+        /* ===== TOTAUX (right-aligned, sans boîte) ===== */
+        .totals-wrap {
             display: table;
             width: 100%;
-            margin-top: 10px;
+            margin-top: 8px;
+            page-break-inside: avoid;
         }
         .totals-spacer { display: table-cell; width: 55%; }
         .totals-box {
             display: table-cell;
             width: 45%;
             vertical-align: top;
+            font-size: 10px;
         }
         .total-row {
             display: table;
             width: 100%;
-            border-bottom: 1px solid #eee;
-            padding: 5px 0;
+            padding: 6px 0;
         }
         .total-label {
             display: table-cell;
-            font-size: 9px;
+            text-align: right;
             color: #555;
+            padding-right: 20px;
+            font-weight: 300;
         }
         .total-value {
             display: table-cell;
             text-align: right;
-            font-weight: 600;
-            font-size: 10px;
+            width: 36%;
+            color: #222;
+            font-weight: 500;
+            font-variant-numeric: tabular-nums;
         }
         .total-ttc {
-            background: #1a237e;
-            color: white;
-            padding: 8px 6px;
-            border-radius: 3px;
-            margin-top: 4px;
+            border-top: 2px solid #222;
+            padding-top: 10px;
+            margin-top: 6px;
         }
-        .total-ttc .total-label, .total-ttc .total-value {
-            color: white;
+        .total-ttc .total-label {
+            font-weight: 600;
+            color: #111;
             font-size: 11px;
-            font-weight: bold;
+        }
+        .total-ttc .total-value {
+            font-weight: 700;
+            color: #111;
+            font-size: 13px;
         }
 
-        /* ===== CONDITIONS & SIGNATURE ===== */
-        .conditions-section {
-            display: table;
-            width: 100%;
-            margin-top: 20px;
-            border: 1px solid #e0e0e0;
-            border-radius: 4px;
-            padding: 12px;
+        /* ===== MERCI / CONDITIONS ===== */
+        .thanks {
+            margin-top: 46px;
+            font-size: 13px;
+            font-weight: 700;
+            color: #111;
         }
-        .conditions-left { display: table-cell; width: 55%; vertical-align: top; font-size: 9px; line-height: 1.7; }
-        .conditions-right { display: table-cell; width: 45%; text-align: center; vertical-align: top; }
-        .signature-box {
-            border: 1px dashed #ccc;
-            padding: 25px 20px;
-            display: inline-block;
-            min-width: 160px;
+        .payment-terms {
+            margin-top: 12px;
+            font-size: 9px;
+            color: #555;
+            line-height: 1.8;
         }
-        .signature-box p { font-size: 9px; color: #888; margin-bottom: 4px; }
+        .payment-terms p { margin-bottom: 4px; }
 
         /* ===== FOOTER ===== */
         .footer {
             position: fixed;
-            bottom: 0;
+            bottom: -104px;
             left: 0;
             right: 0;
-            border-top: 1px solid #ddd;
-            padding: 8px 20px;
-            font-size: 8px;
-            color: #888;
-            background: white;
+            padding-top: 12px;
+            border-top: 1px solid #e4e4e4;
+            font-size: 8.5px;
+            color: #777;
+            line-height: 1.75;
         }
-        .footer-iban { margin-bottom: 3px; }
-        .mentions-legales { font-size: 7.5px; color: #aaa; }
+        .footer .company-footer-name {
+            font-weight: 700;
+            color: #222;
+            margin-bottom: 2px;
+        }
+        .footer a { color: #1B7A8A; text-decoration: none; }
+        .footer .mentions { font-size: 8px; color: #888; margin-top: 3px; }
 
-        /* ===== PAGE BREAK ===== */
+        /* ===== SIGNATURE ===== */
+        .signature-section {
+            margin-top: 40px;
+            display: table;
+            width: 100%;
+        }
+        .signature-left {
+            display: table-cell;
+            width: 55%;
+        }
+        .signature-right {
+            display: table-cell;
+            width: 45%;
+            text-align: right;
+        }
+        .signature-box {
+            display: inline-block;
+            text-align: left;
+            min-width: 200px;
+            padding: 12px 14px 32px;
+            border: 1px dashed #cbcbcb;
+            border-radius: 3px;
+            font-size: 9px;
+            color: #888;
+        }
+        .signature-box .sig-title {
+            font-size: 10px;
+            font-weight: 600;
+            color: #111;
+            margin-bottom: 2px;
+        }
+
+        /* ===== UTILS ===== */
         .page-break { page-break-after: always; }
     </style>
 </head>
 <body>
 
-    {# ===== HEADER SOCIÉTÉ ===== #}
-    <div class="header">
-        <div class="header-left">
-            {% if entreprise.logo %}
-                <img src="{{ entreprise.logo }}" class="company-logo" alt="Logo">
-            {% endif %}
-            <div class="company-name">{{ entreprise.nom }}</div>
-            <div class="company-info">
-                {{ entreprise.adresse }}{% if entreprise.codePostal or entreprise.ville %} — {{ entreprise.codePostal }} {{ entreprise.ville }}{% endif %}<br>
-                {% if entreprise.telephone %}Tél : {{ entreprise.telephone }}{% if entreprise.email %} &nbsp;|&nbsp; {% endif %}{% endif %}
-                {% if entreprise.email %}{{ entreprise.email }}{% endif %}
-                {% if entreprise.siteWeb %}<br>{{ entreprise.siteWeb }}{% endif %}
-            </div>
-        </div>
-        <div class="header-right">
-            {% block header_right %}{% endblock %}
-        </div>
+    {# ===== HEADER DE PAGE (petit, sur chaque page) ===== #}
+    <div class="page-head">
+        <div class="page-head-left">{% block page_head_left %}{% endblock %}</div>
+        <div class="page-head-right"><span class="pagenum"></span></div>
+    </div>
+
+    {# ===== FOOTER (mentions légales sur chaque page) ===== #}
+    <div class="footer">
+        <div class="company-footer-name">{{ entreprise.nom }}</div>
+        {% if entreprise.adresse %}Siège social : {{ entreprise.adresse }}{% if entreprise.codePostal %}, {{ entreprise.codePostal }} {{ entreprise.ville }}{% endif %}<br>{% endif %}
+        {% if entreprise.formeJuridique %}{{ entreprise.formeJuridique }}{% if entreprise.capital %} au capital de {{ entreprise.capital }}{% endif %}<br>{% endif %}
+        {% if entreprise.siret %}N° SIRET : {{ entreprise.siret }}{% endif %}
+        {% if entreprise.rcs and entreprise.villeRcs %} / RCS {{ entreprise.villeRcs|upper }} {{ entreprise.rcs }}{% endif %}
+        {% if entreprise.codeNaf %} / APE : {{ entreprise.codeNaf }}{% endif %}
+        {% if entreprise.tvaIntracommunautaire %}<br>N° TVA intracommunautaire : {{ entreprise.tvaIntracommunautaire }}{% endif %}
+        {% if entreprise.email %}<br>{{ entreprise.email }}{% endif %}
+        {% if entreprise.mentionsLegales %}<div class="mentions">{{ entreprise.mentionsLegales|raw }}</div>{% endif %}
+    </div>
+
+    {# ===== LOGO + NOM (page 1 uniquement) ===== #}
+    <div class="brand-block">
+        {% if entreprise.logo %}
+            <img src="{{ entreprise.logo }}" class="company-logo" alt="{{ entreprise.nom }}">
+        {% endif %}
+        <div class="company-name">{{ entreprise.nom }}</div>
     </div>
 
     {# ===== CORPS DU DOCUMENT ===== #}
     {% block content %}{% endblock %}
-
-    {# ===== CONDITIONS & SIGNATURE ===== #}
-    {% block conditions %}
-    <div class="conditions-section">
-        <div class="conditions-left">
-            <strong>Validité de l'offre :</strong> {{ entreprise.validiteOffre ?? '30 jours' }}<br>
-            <strong>Délai d'exécution :</strong> {{ entreprise.delaiExecution ?? 'À convenir' }}<br>
-            <strong>Mode de règlement :</strong> {{ entreprise.modeReglement ?? 'Selon conditions générales' }}
-        </div>
-        <div class="conditions-right">
-            <div class="signature-box">
-                <p>Bon pour accord</p>
-                <p>Date et signature :</p>
-                <br><br><br>
-            </div>
-        </div>
-    </div>
-    {% endblock %}
-
-    {# ===== FOOTER ===== #}
-    <div class="footer">
-        {% if entreprise.banque or entreprise.iban %}
-        <div class="footer-iban">
-            <strong>Coordonnées bancaires :</strong>
-            {% if entreprise.banque %}{{ entreprise.banque }}{% endif %}
-            {% if entreprise.iban %}&nbsp;| IBAN : {{ entreprise.iban }}{% endif %}
-            {% if entreprise.bic %}&nbsp;| BIC : {{ entreprise.bic }}{% endif %}
-        </div>
-        {% endif %}
-        <div class="mentions-legales">
-            {{ entreprise.nom }}
-            {% if entreprise.formeJuridique %} {{ entreprise.formeJuridique }}{% endif %}
-            {% if entreprise.capital %} au Capital de {{ entreprise.capital }}{% endif %}
-            {% if entreprise.siret %} — SIRET : {{ entreprise.siret }}{% endif %}
-            {% if entreprise.rcs and entreprise.villeRcs %} — RCS {{ entreprise.villeRcs }}{% endif %}
-            {% if entreprise.tvaIntracommunautaire %} — TVA : {{ entreprise.tvaIntracommunautaire }}{% endif %}
-            {% if entreprise.codeNaf %} — NAF : {{ entreprise.codeNaf }}{% endif %}
-        </div>
-    </div>
 
 </body>
 </html>
